@@ -1,8 +1,8 @@
 <p align="center">
-	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
+	<!-- <img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png"> -->
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">心灵AI v3.9.0</h1>
-<h4 align="center">基于Spring Boot 3.x + Vue前后端分离的AI增强企业级管理系统</h4>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">心灵AI v1.0.0</h1>
+<h4 align="center">基于Spring Boot 3.5.x + Vue前后端分离的AI增强企业级管理系统</h4>
 <p align="center">
 	<a href="https://gitee.com/y_project/xinling-Vue/stargazers"><img src="https://gitee.com/y_project/xinling-Vue/badge/star.svg?theme=dark"></a>
 	<a href="https://gitee.com/y_project/xinling-Vue"><img src="https://img.shields.io/badge/xinling-v3.9.0-brightgreen.svg"></a>
@@ -187,7 +187,7 @@
 
 ## 演示图
 
-<table>
+<!-- <table>
     <tr>
         <td><img src="https://oscimg.oschina.net/oscnet/cd1f90be5f2684f4560c9519c0f2a232ee8.jpg"/></td>
         <td><img src="https://oscimg.oschina.net/oscnet/1cbcf0e6f257c7d3a063c0e3f2ff989e4b3.jpg"/></td>
@@ -220,4 +220,4 @@
         <td><img src="https://oscimg.oschina.net/oscnet/b6115bc8c31de52951982e509930b20684a.jpg"/></td>
         <td><img src="https://oscimg.oschina.net/oscnet/up-5e4daac0bb59612c5038448acbcef235e3a.png"/></td>
     </tr>
-</table>
+</table> -->
