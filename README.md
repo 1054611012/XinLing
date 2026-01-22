@@ -4,8 +4,8 @@
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">心灵AI v1.0.0</h1>
 <h4 align="center">基于Spring Boot 3.5.x + Vue前后端分离的AI增强企业级管理系统</h4>
 <p align="center">
-	<a href="https://gitee.com/y_project/xinling-Vue/stargazers"><img src="https://gitee.com/y_project/xinling-Vue/badge/star.svg?theme=dark"></a>
-	<a href="https://gitee.com/y_project/xinling-Vue"><img src="https://img.shields.io/badge/xinling-v3.9.0-brightgreen.svg"></a>
+	<!-- <a href="https://gitee.com/y_project/xinling-Vue/stargazers"><img src="https://gitee.com/y_project/xinling-Vue/badge/star.svg?theme=dark"></a> -->
+	<a href="https://gitee.com/y_project/xinling-Vue"><img src="https://img.shields.io/badge/xinling-v1.0.0-brightgreen.svg"></a>
 	<a href="https://gitee.com/y_project/xinling-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
 </p>
 
