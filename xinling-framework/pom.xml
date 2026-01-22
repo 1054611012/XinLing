@@ -5,7 +5,7 @@
     <parent>
         <artifactId>xinling</artifactId>
         <groupId>com.xinling</groupId>
-        <version>3.9.0</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -70,14 +70,14 @@
         <dependency>
             <groupId>com.xinling</groupId>
             <artifactId>xinling-ai</artifactId>
-            <version>3.9.0</version>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- 缺少 psyc 模块依赖 -->
         <dependency>
             <groupId>com.xinling</groupId>
             <artifactId>xinling-psyc</artifactId>
-            <version>3.9.0</version>
+            <version>1.0.0</version>
         </dependency>
 
 
