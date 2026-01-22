@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.psyc.mapper.PsycOptionsMapper">
+
+    <resultMap type="PsycOptions" id="PsycOptionsResult">
+        <result property="id"    column="id"    />
+        <result property="questionId"    column="question_id"    />
+        <result property="content"    column="content"    />
+        <result property="score"    column="score"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+    </resultMap>
+
+    <sql id="selectPsycOptionsVo">
+        select id, question_id, content, score, sort_order, created_at, updated_at from psyc_options
+    </sql>
+
+    <select id="selectPsycOptionsList" parameterType="PsycOptions" resultMap="PsycOptionsResult">
+        <include refid="selectPsycOptionsVo"/>
+        <where>
+            <if test="questionId != null "> and question_id = #{questionId}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="score != null "> and score = #{score}</if>
+            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="updatedAt != null "> and updated_at = #{updatedAt}</if>
+        </where>
+    </select>
+
+    <select id="selectPsycOptionsById" parameterType="Long" resultMap="PsycOptionsResult">
+        <include refid="selectPsycOptionsVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectPsycOptionsListByQuestionIds" resultMap="PsycOptionsResult">
+        select * from psyc_options where question_id in
+        <foreach item="id" collection="list" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <insert id="insertPsycOptions" parameterType="PsycOptions" useGeneratedKeys="true" keyProperty="id">
+        insert into psyc_options
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">question_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="score != null">score,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="updatedAt != null">updated_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="questionId != null">#{questionId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="score != null">#{score},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePsycOptions" parameterType="PsycOptions">
+        update psyc_options
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="questionId != null">question_id = #{questionId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePsycOptionsById" parameterType="Long">
+        delete from psyc_options where id = #{id}
+    </delete>
+
+    <delete id="deletePsycOptionsByIds" parameterType="String">
+        delete from psyc_options where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

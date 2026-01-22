@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.psyc.mapper.PsycPostMapper">
+
+    <resultMap type="PsycPost" id="PsycPostResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="content"    column="content"    />
+        <result property="visible"    column="visible"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="favoriteCount"    column="favorite_count"    />
+        <result property="shareCount"    column="share_count"    />
+        <result property="status"    column="status"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+    </resultMap>
+
+    <resultMap id="PsycPostPsycPostMediaResult" type="PsycPost" extends="PsycPostResult">
+        <collection property="psycPostMediaList" ofType="PsycPostMedia" column="id" select="selectPsycPostMediaList" />
+    </resultMap>
+
+    <resultMap type="PsycPostMedia" id="PsycPostMediaResult">
+        <result property="id"    column="id"    />
+        <result property="postId"    column="post_id"    />
+        <result property="mediaUrl"    column="media_url"    />
+        <result property="mediaType"    column="media_type"    />
+        <result property="sortOrder"    column="sort_order"    />
+    </resultMap>
+
+    <sql id="selectPsycPostVo">
+        select id, user_id, content, visible, like_count, comment_count, favorite_count, share_count, status, created_at, updated_at from psyc_post
+    </sql>
+
+    <select id="selectPsycPostList" parameterType="PsycPost" resultMap="PsycPostResult">
+        <include refid="selectPsycPostVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="visible != null "> and visible = #{visible}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(created_at,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(created_at,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectPsycPostById" parameterType="Long" resultMap="PsycPostPsycPostMediaResult">
+        select id, user_id, content, visible, like_count, comment_count, favorite_count, share_count, status, created_at, updated_at
+        from psyc_post
+        where id = #{id}
+    </select>
+
+    <select id="selectPsycPostMediaList" resultMap="PsycPostMediaResult">
+        select id, post_id, media_url, media_type, sort_order
+        from psyc_post_media
+        where post_id = #{post_id}
+    </select>
+
+    <insert id="insertPsycPost" parameterType="PsycPost" useGeneratedKeys="true" keyProperty="id">
+        insert into psyc_post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="content != null">content,</if>
+            <if test="visible != null">visible,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="commentCount != null">comment_count,</if>
+            <if test="favoriteCount != null">favorite_count,</if>
+            <if test="shareCount != null">share_count,</if>
+            <if test="status != null">status,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="updatedAt != null">updated_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="visible != null">#{visible},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="commentCount != null">#{commentCount},</if>
+            <if test="favoriteCount != null">#{favoriteCount},</if>
+            <if test="shareCount != null">#{shareCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePsycPost" parameterType="PsycPost">
+        update psyc_post
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="visible != null">visible = #{visible},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="commentCount != null">comment_count = #{commentCount},</if>
+            <if test="favoriteCount != null">favorite_count = #{favoriteCount},</if>
+            <if test="shareCount != null">share_count = #{shareCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePsycPostById" parameterType="Long">
+        delete from psyc_post where id = #{id}
+    </delete>
+
+    <delete id="deletePsycPostByIds" parameterType="String">
+        delete from psyc_post where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deletePsycPostMediaByPostIds" parameterType="String">
+        delete from psyc_post_media where post_id in
+        <foreach item="postId" collection="array" open="(" separator="," close=")">
+            #{postId}
+        </foreach>
+    </delete>
+
+    <delete id="deletePsycPostMediaByPostId" parameterType="Long">
+        delete from psyc_post_media where post_id = #{postId}
+    </delete>
+
+    <insert id="batchPsycPostMedia">
+        insert into psyc_post_media( id, post_id, media_url, media_type, sort_order) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.postId}, #{item.mediaUrl}, #{item.mediaType}, #{item.sortOrder})
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.education.mapper.MusicalInstrumentsMapper">
+
+    <resultMap type="MusicalInstruments" id="MusicalInstrumentsResult">
+        <result property="id"    column="id"    />
+        <result property="image"    column="image"    />
+        <result property="instrumentName"    column="instrument_name"    />
+        <result property="firstCategory"    column="first_category"    />
+        <result property="sortNumber"    column="sort_number"    />
+        <result property="isMemberOnly"    column="is_member_only"    />
+        <result property="isDisplayed"    column="is_displayed"    />
+    </resultMap>
+
+    <sql id="selectMusicalInstrumentsVo">
+        select id, image, instrument_name, first_category, sort_number, is_member_only, is_displayed from musical_instruments
+    </sql>
+
+    <select id="selectMusicalInstrumentsList" parameterType="MusicalInstruments" resultMap="MusicalInstrumentsResult">
+        <include refid="selectMusicalInstrumentsVo"/>
+        <where>
+            <if test="image != null  and image != ''"> and image = #{image}</if>
+            <if test="instrumentName != null  and instrumentName != ''"> and instrument_name like concat('%', #{instrumentName}, '%')</if>
+            <if test="firstCategory != null  and firstCategory != ''"> and first_category = #{firstCategory}</if>
+            <if test="sortNumber != null "> and sort_number = #{sortNumber}</if>
+            <if test="isMemberOnly != null "> and is_member_only = #{isMemberOnly}</if>
+            <if test="isDisplayed != null "> and is_displayed = #{isDisplayed}</if>
+        </where>
+    </select>
+
+    <select id="selectMusicalInstrumentsById" parameterType="String" resultMap="MusicalInstrumentsResult">
+        <include refid="selectMusicalInstrumentsVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMusicalInstruments" parameterType="MusicalInstruments" useGeneratedKeys="true" keyProperty="id">
+        insert into musical_instruments
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="image != null">image,</if>
+            <if test="instrumentName != null and instrumentName != ''">instrument_name,</if>
+            <if test="firstCategory != null and firstCategory != ''">first_category,</if>
+            <if test="sortNumber != null">sort_number,</if>
+            <if test="isMemberOnly != null">is_member_only,</if>
+            <if test="isDisplayed != null">is_displayed,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="image != null">#{image},</if>
+            <if test="instrumentName != null and instrumentName != ''">#{instrumentName},</if>
+            <if test="firstCategory != null and firstCategory != ''">#{firstCategory},</if>
+            <if test="sortNumber != null">#{sortNumber},</if>
+            <if test="isMemberOnly != null">#{isMemberOnly},</if>
+            <if test="isDisplayed != null">#{isDisplayed},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMusicalInstruments" parameterType="MusicalInstruments">
+        update musical_instruments
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="image != null">image = #{image},</if>
+            <if test="instrumentName != null and instrumentName != ''">instrument_name = #{instrumentName},</if>
+            <if test="firstCategory != null and firstCategory != ''">first_category = #{firstCategory},</if>
+            <if test="sortNumber != null">sort_number = #{sortNumber},</if>
+            <if test="isMemberOnly != null">is_member_only = #{isMemberOnly},</if>
+            <if test="isDisplayed != null">is_displayed = #{isDisplayed},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMusicalInstrumentsById" parameterType="String">
+        delete from musical_instruments where id = #{id}
+    </delete>
+
+    <delete id="deleteMusicalInstrumentsByIds" parameterType="String">
+        delete from musical_instruments where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

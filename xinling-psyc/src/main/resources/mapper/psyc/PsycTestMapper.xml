@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.psyc.mapper.PsycTestMapper">
+
+    <resultMap type="PsycTest" id="PsycTestResult">
+        <result property="id"    column="id"    />
+        <result property="testName"    column="test_name"    />
+        <result property="description"    column="description"    />
+        <result property="status"    column="status"    />
+        <result property="totalQuestions"    column="total_questions"    />
+        <result property="duration"    column="duration"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="PsycTestPsycAssessmentRuleResult" type="PsycTest" extends="PsycTestResult">
+        <collection property="psycAssessmentRuleList" ofType="PsycAssessmentRule" column="id" select="selectPsycAssessmentRuleList" />
+    </resultMap>
+
+    <resultMap type="PsycAssessmentRule" id="PsycAssessmentRuleResult">
+        <result property="id"    column="id"    />
+        <result property="testId"    column="test_id"    />
+        <result property="minScore"    column="min_score"    />
+        <result property="maxScore"    column="max_score"    />
+        <result property="level"    column="level"    />
+        <result property="suggestion"    column="suggestion"    />
+        <result property="referenceResult"    column="reference_result"    />
+        <result property="priority"    column="priority"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <sql id="selectPsycTestVo">
+        select id, test_name, description, status, total_questions, duration, create_time, update_time from psyc_test
+    </sql>
+
+    <select id="selectPsycTestList" parameterType="PsycTest" resultMap="PsycTestResult">
+        <include refid="selectPsycTestVo"/>
+        <where>
+            <if test="testName != null  and testName != ''"> and test_name like concat('%', #{testName}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="totalQuestions != null "> and total_questions = #{totalQuestions}</if>
+            <if test="duration != null "> and duration = #{duration}</if>
+        </where>
+    </select>
+
+    <select id="selectPsycTestById" parameterType="Long" resultMap="PsycTestPsycAssessmentRuleResult">
+        select id, test_name, description, status, total_questions, duration, create_time, update_time
+        from psyc_test
+        where id = #{id}
+    </select>
+
+    <select id="selectPsycAssessmentRuleList" resultMap="PsycAssessmentRuleResult">
+        select id, test_id, min_score, max_score, level, suggestion, reference_result, priority, is_deleted
+        from psyc_assessment_rule
+        where test_id = #{test_id}
+    </select>
+
+    <insert id="insertPsycTest" parameterType="PsycTest" useGeneratedKeys="true" keyProperty="id">
+        insert into psyc_test
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="testName != null and testName != ''">test_name,</if>
+            <if test="description != null">description,</if>
+            <if test="status != null">status,</if>
+            <if test="totalQuestions != null">total_questions,</if>
+            <if test="duration != null">duration,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="testName != null and testName != ''">#{testName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="status != null">#{status},</if>
+            <if test="totalQuestions != null">#{totalQuestions},</if>
+            <if test="duration != null">#{duration},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePsycTest" parameterType="PsycTest">
+        update psyc_test
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="testName != null and testName != ''">test_name = #{testName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="totalQuestions != null">total_questions = #{totalQuestions},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePsycTestById" parameterType="Long">
+        delete from psyc_test where id = #{id}
+    </delete>
+
+    <delete id="deletePsycTestByIds" parameterType="String">
+        delete from psyc_test where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deletePsycAssessmentRuleByTestIds" parameterType="String">
+        delete from psyc_assessment_rule where test_id in
+        <foreach item="testId" collection="array" open="(" separator="," close=")">
+            #{testId}
+        </foreach>
+    </delete>
+
+    <delete id="deletePsycAssessmentRuleByTestId" parameterType="Long">
+        delete from psyc_assessment_rule where test_id = #{testId}
+    </delete>
+
+    <insert id="batchPsycAssessmentRule">
+        insert into psyc_assessment_rule( id, test_id, min_score, max_score, level, suggestion, reference_result, priority, is_deleted) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.testId}, #{item.minScore}, #{item.maxScore}, #{item.level}, #{item.suggestion}, #{item.referenceResult}, #{item.priority}, #{item.isDeleted})
+        </foreach>
+    </insert>
+</mapper>

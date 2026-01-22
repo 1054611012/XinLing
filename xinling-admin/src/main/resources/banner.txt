@@ -1,0 +1,10 @@
+Application Version: ${xinling.version}
+Spring Boot Version: ${spring-boot.version}
+
+       .__       .__  .__
+___  __|__| ____ |  | |__| ____    ____
+\  \/  /  |/    \|  | |  |/    \  / ___\
+ >    <|  |   |  \  |_|  |   |  \/ /_/  >
+/__/\_ \__|___|  /____/__|___|  /\___  /
+      \/       \/             \//_____/
+

@@ -1,0 +1,207 @@
+# 项目核心配置
+xinling:
+  # 基础信息
+  name: XinLing
+  version: 1.0.0
+  copyrightYear: 2025
+
+  # 文件路径
+  # Windows: D:/xinling/uploadPath
+  # Linux: /home/xinling/uploadPath
+  profile: /Volumes/Suxia/IdeaProjects
+
+  # 系统设置
+  addressEnabled: false  # 获取IP地址开关
+  captchaType: math      # 验证码类型: math | char
+
+  # 消息队列配置
+  mq:
+    type: rabbitmq  # 可选值: rabbitmq 或 kafka
+  rabbitmq:
+    chat-exchange: chat.exchange
+    chat-queue: chat.queue
+    chat-routing-key: chat.routing.key
+  kafka:
+    bootstrap-servers: localhost:9092
+    chat-topic: chat.topic
+    consumer:
+      group-id: chat_group
+      concurrency: 1
+
+  # 推送系统配置
+  push:
+    enabled: true                    # 是否启用推送系统
+    default-timeout: 300             # 默认连接超时时间（秒）
+    max-connections: 1000           # 最大连接数
+    heartbeat-interval: 30          # 心跳间隔（秒）
+    buffer-size: 1024               # 消息缓冲区大小
+    redis-broadcast-enabled: true   # 是否启用 Redis 广播（多节点）
+    redis-channel: push_channel     # Redis 频道名称
+
+# 服务端配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    connection-timeout: 1800000
+    keep-alive-timeout: 1800000
+    servlet:
+      session:
+        timeout: 30m
+    threads:
+      max: 800
+      min-spare: 100
+
+# 用户配置
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
+
+# AI 配置
+ai:
+  model:
+    provider: ollama
+    default-model: qwen2.5:3b
+    use-local: true
+
+  ollama:
+    base-url: http://localhost:11434
+    api-key: ollama
+    model: qwen2.5:3b
+    timeout-seconds: 360
+
+  deepseek:
+    base-url: https://api.deepseek.com/v1
+    api-key: sk-54fe2afaf41b4a999f5a4f7da46f420c
+    model: qwen2.5:3b
+    timeout-seconds: 360
+
+  openai:
+    api-key: your-openai-api-key
+    base-url: https://api.openai.com/v1
+    model: gpt-4o-mini
+
+  rag:
+    knowledge-base-path: /Volumes/Suxia/IdeaProjects/XingLing-Vue/knowledge-base
+    max-results: 3
+    min-score: 0.5
+    chunk-size: 500
+    chunk-overlap: 0
+
+# Spring 核心配置
+spring:
+  # 国际化
+  messages:
+    basename: i18n/messages
+
+  # 环境配置
+  profiles:
+    active: druid
+
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # 开发工具
+  devtools:
+    restart:
+      enabled: true
+
+  # 数据存储
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait-time: -1ms
+
+  # 消息中间件配置
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+
+  kafka:
+    bootstrap-servers: ${xinling.kafka.bootstrap-servers:localhost:9092}
+    consumer:
+      group-id: ${xinling.kafka.consumer.group-id:chat_group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.xinling.mq.dto"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "com.xinling.mq.dto"
+    listener:
+      ack-mode: manual_immediate
+
+# 安全配置
+token:
+  header: Authorization
+  secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+  expireTime: 30
+
+# 数据库配置
+mybatis:
+  typeAliasesPackage: com.xinling.**.domain
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# API文档配置
+springdoc:
+  api-docs:
+    enabled: ${swagger.enabled:true}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${swagger.enabled:true}
+    path: /swagger-ui.html
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.xinling
+  show-actuator: true
+  server:
+    base-path: ${swagger.pathMapping:/dev-api}
+
+# 安全防护配置
+xss:
+  enabled: true
+  excludes: /system/notice
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+# 日志配置
+logging:
+  level:
+    com.xinling.web.controller.api.RemindController: INFO
+    com.xinling: DEBUG
+    org.springframework: WARN
