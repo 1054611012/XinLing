@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyPropertyMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyProperty" id="OntologyPropertyResult">
+        <result property="propertyId"    column="property_id"    />
+        <result property="propertyName"    column="property_name"    />
+        <result property="propertyCode"    column="property_code"    />
+        <result property="propertyType"    column="property_type"    />
+        <result property="conceptId"    column="concept_id"    />
+        <result property="conceptName"    column="concept_name"    />
+        <result property="required"    column="required"    />
+        <result property="defaultValue"    column="default_value"    />
+        <result property="enumValues"    column="enum_values"    />
+        <result property="description"    column="description"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyPropertyVo">
+        select p.property_id, p.property_name, p.property_code, p.property_type,
+               p.concept_id, c.concept_name as concept_name, p.required,
+               p.default_value, p.enum_values, p.description,
+               p.sort_order, p.status,
+               p.create_by, p.create_time, p.update_by, p.update_time
+        from ai_ontology_property p
+        left join ai_ontology_concept c on p.concept_id = c.concept_id
+    </sql>
+
+    <select id="selectOntologyPropertyList" parameterType="com.xinling.ai.domain.ontology.OntologyProperty" resultMap="OntologyPropertyResult">
+        <include refid="selectOntologyPropertyVo"/>
+        <where>
+            <if test="propertyName != null and propertyName != ''">
+                AND p.property_name like concat('%', #{propertyName}, '%')
+            </if>
+            <if test="propertyCode != null and propertyCode != ''">
+                AND p.property_code = #{propertyCode}
+            </if>
+            <if test="propertyType != null and propertyType != ''">
+                AND p.property_type = #{propertyType}
+            </if>
+            <if test="conceptId != null">
+                AND p.concept_id = #{conceptId}
+            </if>
+            <if test="status != null and status != ''">
+                AND p.status = #{status}
+            </if>
+        </where>
+        order by p.sort_order, p.property_id
+    </select>
+
+    <select id="selectOntologyPropertyById" parameterType="Long" resultMap="OntologyPropertyResult">
+        <include refid="selectOntologyPropertyVo"/>
+        where p.property_id = #{propertyId}
+    </select>
+
+    <select id="selectPropertiesByConceptId" parameterType="Long" resultMap="OntologyPropertyResult">
+        <include refid="selectOntologyPropertyVo"/>
+        where p.concept_id = #{conceptId}
+        order by p.sort_order
+    </select>
+
+    <insert id="insertOntologyProperty" parameterType="com.xinling.ai.domain.ontology.OntologyProperty" useGeneratedKeys="true" keyProperty="propertyId">
+        insert into ai_ontology_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="propertyName != null and propertyName != ''">property_name,</if>
+            <if test="propertyCode != null and propertyCode != ''">property_code,</if>
+            <if test="propertyType != null and propertyType != ''">property_type,</if>
+            <if test="conceptId != null">concept_id,</if>
+            <if test="required != null and required != ''">required,</if>
+            <if test="defaultValue != null">default_value,</if>
+            <if test="enumValues != null">enum_values,</if>
+            <if test="description != null">description,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="propertyName != null and propertyName != ''">#{propertyName},</if>
+            <if test="propertyCode != null and propertyCode != ''">#{propertyCode},</if>
+            <if test="propertyType != null and propertyType != ''">#{propertyType},</if>
+            <if test="conceptId != null">#{conceptId},</if>
+            <if test="required != null and required != ''">#{required},</if>
+            <if test="defaultValue != null">#{defaultValue},</if>
+            <if test="enumValues != null">#{enumValues},</if>
+            <if test="description != null">#{description},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyProperty" parameterType="com.xinling.ai.domain.ontology.OntologyProperty">
+        update ai_ontology_property
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="propertyName != null and propertyName != ''">property_name = #{propertyName},</if>
+            <if test="propertyCode != null and propertyCode != ''">property_code = #{propertyCode},</if>
+            <if test="propertyType != null and propertyType != ''">property_type = #{propertyType},</if>
+            <if test="conceptId != null">concept_id = #{conceptId},</if>
+            <if test="required != null and required != ''">required = #{required},</if>
+            <if test="defaultValue != null">default_value = #{defaultValue},</if>
+            <if test="enumValues != null">enum_values = #{enumValues},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where property_id = #{propertyId}
+    </update>
+
+    <delete id="deleteOntologyPropertyById" parameterType="Long">
+        delete from ai_ontology_property where property_id = #{propertyId}
+    </delete>
+
+    <delete id="deleteOntologyPropertyByIds" parameterType="Long">
+        delete from ai_ontology_property where property_id in
+        <foreach item="propertyId" collection="array" open="(" separator="," close=")">
+            #{propertyId}
+        </foreach>
+    </delete>
+
+    <select id="checkPropertyCodeUnique" resultMap="OntologyPropertyResult">
+        <include refid="selectOntologyPropertyVo"/>
+        where p.property_code = #{propertyCode}
+        <if test="propertyId != null and propertyId != 0">
+            and p.property_id != #{propertyId}
+        </if>
+        limit 1
+    </select>
+
+</mapper>

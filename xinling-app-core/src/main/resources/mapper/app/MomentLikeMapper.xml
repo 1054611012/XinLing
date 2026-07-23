@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.MomentLikeMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.MomentLike">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="moment_id" property="momentId" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, moment_id, create_time
+    </sql>
+
+    <select id="selectByUserAndMoment" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM moment_like
+        WHERE user_id = #{userId} AND moment_id = #{momentId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO moment_like (user_id, moment_id, create_time)
+        VALUES (#{userId}, #{momentId}, NOW())
+    </insert>
+
+    <delete id="deleteByUserAndMoment">
+        DELETE FROM moment_like
+        WHERE user_id = #{userId} AND moment_id = #{momentId}
+    </delete>
+
+</mapper>

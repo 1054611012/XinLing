@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserGrowthMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.UserGrowth">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="level" property="level" />
+        <result column="exp" property="exp" />
+        <result column="points" property="points" />
+        <result column="continuous_focus_days" property="continuousFocusDays" />
+        <result column="continuous_sleep_days" property="continuousSleepDays" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, level, exp, points, continuous_focus_days, continuous_sleep_days,
+        create_time, update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_growth
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_growth (user_id, level, exp, points, continuous_focus_days, continuous_sleep_days, create_time)
+        VALUES (#{userId}, #{level}, #{exp}, #{points}, #{continuousFocusDays}, #{continuousSleepDays}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE user_growth
+        <set>
+            <if test="level != null">level = #{level},</if>
+            <if test="exp != null">exp = #{exp},</if>
+            <if test="points != null">points = #{points},</if>
+            <if test="continuousFocusDays != null">continuous_focus_days = #{continuousFocusDays},</if>
+            <if test="continuousSleepDays != null">continuous_sleep_days = #{continuousSleepDays},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

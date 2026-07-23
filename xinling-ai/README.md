@@ -21,7 +21,7 @@
 
 ### 1. 配置类
 - [AiConfigProperties](src/main/java/com/xinling/ai/config/AiConfigProperties.java)：AI配置属性
-- [Langchain4jConfig](src/main/java/com/xinling/ai/config/Langchain4jConfig.java)：LangChain4j相关配置
+- [Langchain4jConfig](src/main/java/com/xinling/ai/config/LangChain4jConfig.java)：LangChain4j相关配置
 
 ### 2. 服务类
 - [OllamaService](src/main/java/com/xinling/ai/service/OllamaService.java)：Ollama模型调用服务

@@ -1,5 +1,6 @@
 package com.xinling.quartz.task;
 
+import com.xinling.common.constant.RedisKeys;
 import com.xinling.common.core.redis.RedisCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,7 @@ public class ChatHistoryCleanupTask {
     @Autowired
     private RedisCache redisCache;
 
-    private static final String CHAT_HISTORY_PREFIX = "chat:history:";
     private static final String CHAT_SESSION_PREFIX = "chat:session:";
-    private static final String USER_SESSIONS_PREFIX = "chat:user_sessions:";
 
     /**
      * 每天凌晨2点清理过期的聊天记录
@@ -35,7 +34,7 @@ public class ChatHistoryCleanupTask {
 
         try {
             // 1. 清理过期的会话历史记录
-            Collection<String> historyKeys = redisCache.keys(CHAT_HISTORY_PREFIX + "*");
+            Collection<String> historyKeys = redisCache.keys(RedisKeys.CHAT_HISTORY + "*");
             int historyCleaned = 0;
             for (String key : historyKeys) {
                 if (!redisCache.hasKey(key)) {
@@ -46,7 +45,7 @@ public class ChatHistoryCleanupTask {
             }
 
             // 2. 清理过期的会话信息
-            Collection<String> sessionKeys = redisCache.keys(CHAT_SESSION_PREFIX + "*");
+            Collection<String> sessionKeys = redisCache.keys(RedisKeys.CHAT_USER_SESSIONS + "*");
             int sessionCleaned = 0;
             for (String key : sessionKeys) {
                 if (!redisCache.hasKey(key)) {
@@ -57,7 +56,7 @@ public class ChatHistoryCleanupTask {
             }
 
             // 3. 清理用户会话列表中的无效引用
-            Collection<String> userSessionKeys = redisCache.keys(USER_SESSIONS_PREFIX + "*");
+            Collection<String> userSessionKeys = redisCache.keys(RedisKeys.CHAT_USER_SESSIONS + "*");
             int userSessionCleaned = 0;
             for (String key : userSessionKeys) {
                 try {

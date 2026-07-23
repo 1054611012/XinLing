@@ -30,41 +30,47 @@ public class PsycFeedbackReply extends BaseEntity
     @Excel(name = "回复内容")
     private String content;
 
-    public void setId(Long id)
-    {
+    @Excel(name = "回复用户名称")
+    private transient String replyUserName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId()
-    {
-        return id;
+    public Long getFeedbackId() {
+        return feedbackId;
     }
-    public void setFeedbackId(Long feedbackId)
-    {
+
+    public void setFeedbackId(Long feedbackId) {
         this.feedbackId = feedbackId;
     }
 
-    public Long getFeedbackId()
-    {
-        return feedbackId;
+    public Long getReplyUserId() {
+        return replyUserId;
     }
-    public void setReplyUserId(Long replyUserId)
-    {
+
+    public void setReplyUserId(Long replyUserId) {
         this.replyUserId = replyUserId;
     }
 
-    public Long getReplyUserId()
-    {
-        return replyUserId;
+    public String getContent() {
+        return content;
     }
-    public void setContent(String content)
-    {
+
+    public void setContent(String content) {
         this.content = content;
     }
 
-    public String getContent()
-    {
-        return content;
+    public String getReplyUserName() {
+        return replyUserName;
+    }
+
+    public void setReplyUserName(String replyUserName) {
+        this.replyUserName = replyUserName;
     }
 
     @Override
@@ -73,6 +79,7 @@ public class PsycFeedbackReply extends BaseEntity
             .append("id", getId())
             .append("feedbackId", getFeedbackId())
             .append("replyUserId", getReplyUserId())
+            .append("replyUserName", getReplyUserName())
             .append("content", getContent())
             .append("createTime", getCreateTime())
             .toString();

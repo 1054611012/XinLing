@@ -1,0 +1,185 @@
+# 项目核心配置
+xinling:
+  # 基础信息
+  name: XinLing-APP
+  version: 1.0.0
+  copyrightYear: 2025
+
+  # 文件路径
+  profile: /Volumes/Suxia/IdeaProjects/XinLing
+
+  # 系统设置
+  addressEnabled: false
+
+  # 安全配置（关闭 admin 的 Spring Security，使用 AppAuthInterceptor 鉴权）
+  security:
+    enabled: false
+
+  # 消息队列配置
+  mq:
+    type: rabbitmq
+  rabbitmq:
+    chat-exchange: chat.exchange
+    chat-queue: chat.queue
+    chat-routing-key: chat.routing.key
+  kafka:
+    bootstrap-servers: localhost:9092
+    chat-topic: chat.topic
+    consumer:
+      group-id: chat_group
+      concurrency: 1
+
+  # 推送系统配置
+  push:
+    enabled: true
+    default-timeout: 300
+    max-connections: 1000
+    heartbeat-interval: 30
+    buffer-size: 1024
+    redis-broadcast-enabled: true
+    redis-channel: push_channel
+
+# 服务端配置 - 端口 8081（区别于管理端的 8080）
+server:
+  port: 9080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    connection-timeout: 1800000
+    keep-alive-timeout: 1800000
+    threads:
+      max: 400
+      min-spare: 50
+
+# 用户配置
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
+
+# AI 配置
+ai:
+  model:
+    provider: ollama
+    default-model: qwen2.5:3b
+    use-local: true
+  ollama:
+    base-url: http://localhost:11434
+    api-key: ollama
+    chat-model: qwen2.5:3b
+    embedding-model: nomic-embed-text
+    timeout-seconds: 360
+  deepseek:
+    base-url: https://api.deepseek.com/v1
+    api-key: sk-54fe2afaf41b4a999f5a4f7da46f420c
+    model: qwen2.5:3b
+    timeout-seconds: 360
+  openai:
+    api-key: your-openai-api-key
+    base-url: https://api.openai.com/v1
+    model: gpt-4o-mini
+  rag:
+    knowledge-base-path: /Volumes/Suxia/IdeaProjects/XinLing/knowledge-base
+    max-results: 5
+    min-score: 0.3
+    chunk-size: 500
+    chunk-overlap: 0
+    vector-store-path: /Volumes/Suxia/IdeaProjects/XinLing/vector-store
+    enable-initialization: true
+  langfuse:
+    enabled: false
+    host: http://localhost:3000
+    public-key: ${LANGFUSE_PUBLIC_KEY:}
+    secret-key: ${LANGFUSE_SECRET_KEY:}
+
+# Spring 核心配置
+spring:
+  # 排除 Spring Security 自动配置（APP 使用 AppAuthInterceptor 鉴权）
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+  # 环境配置
+  profiles:
+    active: druid
+
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # 数据存储
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait-time: -1ms
+
+  # 消息中间件
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+
+  kafka:
+    bootstrap-servers: ${xinling.kafka.bootstrap-servers:localhost:9092}
+    consumer:
+      group-id: ${xinling.kafka.consumer.group-id:chat_group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.xinling.mq.dto"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "com.xinling.mq.dto"
+    listener:
+      ack-mode: manual_immediate
+
+# 安全配置
+token:
+  header: Authorization
+  secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+  expireTime: 30
+
+# 数据库配置
+mybatis:
+  typeAliasesPackage: com.xinling.**.domain
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# 日志配置
+logging:
+  level:
+    com.xinling: DEBUG
+    org.springframework: WARN
+    org.apache.coyote: INFO
+    org.apache.tomcat: INFO

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserActivityMapper">
+
+    <resultMap id="UserActivityResult" type="com.xinling.app.domain.entity.UserActivity">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="activity_id" property="activityId" />
+        <result column="join_time" property="joinTime" />
+        <result column="order_no" property="orderNo" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, activity_id, join_time, order_no, create_time
+    </sql>
+
+    <select id="selectByUserAndActivity" resultMap="UserActivityResult">
+        SELECT <include refid="selectColumns" />
+        FROM user_activity
+        WHERE user_id = #{userId} AND activity_id = #{activityId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_activity (user_id, activity_id, join_time)
+        VALUES (#{userId}, #{activityId}, NOW())
+    </insert>
+</mapper>

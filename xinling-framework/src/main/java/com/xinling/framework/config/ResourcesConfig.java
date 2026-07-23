@@ -51,7 +51,7 @@ public class ResourcesConfig implements WebMvcConfigurer {
                 .setCacheControl(CacheControl.maxAge(5, TimeUnit.HOURS).cachePublic());
 
         // 通用静态资源
-        registry.addResourceHandler("/static/**", "/*.html", "/css/**", "/js/**", "/img/**", "/images/**", "/plugins/**", "/public/**", "/profile/**")
+        registry.addResourceHandler("/static/**", "/css/**", "/js/**", "/img/**", "/images/**", "/plugins/**", "/public/**", "/profile/**")
                 .addResourceLocations("classpath:/static/")
                 .setCacheControl(CacheControl.maxAge(5, TimeUnit.HOURS).cachePublic());
     }

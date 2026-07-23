@@ -1,37 +1,69 @@
 package com.xinling.framework.aspectj;
 
 import java.util.Collection;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.JoinPoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.AfterThrowing;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.NamedThreadLocal;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.validation.BindingResult;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.alibaba.fastjson2.JSON;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.annotation.Log;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.entity.SysUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.model.LoginUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.text.Convert;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.enums.BusinessStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.enums.HttpMethod;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.filter.PropertyPreExcludeFilter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.ExceptionUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.SecurityUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.ServletUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.ip.IpUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.framework.manager.AsyncManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.framework.manager.factory.AsyncFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.system.domain.SysOperLog;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * 操作日志记录处理
@@ -39,7 +71,9 @@ import com.xinling.system.domain.SysOperLog;
  * @author xinling
  */
 @Aspect
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class LogAspect
 {
     private static final Logger log = LoggerFactory.getLogger(LogAspect.class);

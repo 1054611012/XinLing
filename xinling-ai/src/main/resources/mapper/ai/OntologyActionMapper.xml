@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyActionMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyAction" id="OntologyActionResult">
+        <result property="actionId"    column="action_id"    />
+        <result property="actionName"    column="action_name"    />
+        <result property="actionCode"    column="action_code"    />
+        <result property="conceptId"    column="concept_id"    />
+        <result property="conceptName"    column="concept_name"    />
+        <result property="actionType"    column="action_type"    />
+        <result property="target"    column="target"    />
+        <result property="parameters"    column="parameters"    />
+        <result property="description"    column="description"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyActionVo">
+        select a.action_id, a.action_name, a.action_code,
+               a.concept_id, c.concept_name as concept_name,
+               a.action_type, a.target, a.parameters,
+               a.description, a.status,
+               a.create_by, a.create_time, a.update_by, a.update_time
+        from ai_ontology_action a
+        left join ai_ontology_concept c on a.concept_id = c.concept_id
+    </sql>
+
+    <select id="selectOntologyActionList" parameterType="com.xinling.ai.domain.ontology.OntologyAction" resultMap="OntologyActionResult">
+        <include refid="selectOntologyActionVo"/>
+        <where>
+            <if test="actionName != null and actionName != ''">
+                AND a.action_name like concat('%', #{actionName}, '%')
+            </if>
+            <if test="actionCode != null and actionCode != ''">
+                AND a.action_code = #{actionCode}
+            </if>
+            <if test="conceptId != null">
+                AND a.concept_id = #{conceptId}
+            </if>
+            <if test="actionType != null and actionType != ''">
+                AND a.action_type = #{actionType}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        order by a.action_id
+    </select>
+
+    <select id="selectOntologyActionById" parameterType="Long" resultMap="OntologyActionResult">
+        <include refid="selectOntologyActionVo"/>
+        where a.action_id = #{actionId}
+    </select>
+
+    <select id="selectActionsByConceptId" parameterType="Long" resultMap="OntologyActionResult">
+        <include refid="selectOntologyActionVo"/>
+        where a.concept_id = #{conceptId}
+        order by a.action_id
+    </select>
+
+    <insert id="insertOntologyAction" parameterType="com.xinling.ai.domain.ontology.OntologyAction" useGeneratedKeys="true" keyProperty="actionId">
+        insert into ai_ontology_action
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="actionName != null and actionName != ''">action_name,</if>
+            <if test="actionCode != null and actionCode != ''">action_code,</if>
+            <if test="conceptId != null">concept_id,</if>
+            <if test="actionType != null and actionType != ''">action_type,</if>
+            <if test="target != null">target,</if>
+            <if test="parameters != null">parameters,</if>
+            <if test="description != null">description,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="actionName != null and actionName != ''">#{actionName},</if>
+            <if test="actionCode != null and actionCode != ''">#{actionCode},</if>
+            <if test="conceptId != null">#{conceptId},</if>
+            <if test="actionType != null and actionType != ''">#{actionType},</if>
+            <if test="target != null">#{target},</if>
+            <if test="parameters != null">#{parameters},</if>
+            <if test="description != null">#{description},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyAction" parameterType="com.xinling.ai.domain.ontology.OntologyAction">
+        update ai_ontology_action
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actionName != null and actionName != ''">action_name = #{actionName},</if>
+            <if test="actionCode != null and actionCode != ''">action_code = #{actionCode},</if>
+            <if test="conceptId != null">concept_id = #{conceptId},</if>
+            <if test="actionType != null and actionType != ''">action_type = #{actionType},</if>
+            <if test="target != null">target = #{target},</if>
+            <if test="parameters != null">parameters = #{parameters},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where action_id = #{actionId}
+    </update>
+
+    <delete id="deleteOntologyActionById" parameterType="Long">
+        delete from ai_ontology_action where action_id = #{actionId}
+    </delete>
+
+    <delete id="deleteOntologyActionByIds" parameterType="Long">
+        delete from ai_ontology_action where action_id in
+        <foreach item="actionId" collection="array" open="(" separator="," close=")">
+            #{actionId}
+        </foreach>
+    </delete>
+
+    <select id="checkActionCodeUnique" resultMap="OntologyActionResult">
+        <include refid="selectOntologyActionVo"/>
+        where a.action_code = #{actionCode}
+        <if test="actionId != null and actionId != 0">
+            and a.action_id != #{actionId}
+        </if>
+        limit 1
+    </select>
+
+</mapper>

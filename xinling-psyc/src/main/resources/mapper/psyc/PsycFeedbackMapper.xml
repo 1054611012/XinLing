@@ -7,6 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="PsycFeedback" id="PsycFeedbackResult">
         <result property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
         <result property="type"    column="type"    />
         <result property="content"    column="content"    />
         <result property="images"    column="images"    />
@@ -25,12 +26,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="feedbackId"    column="feedback_id"    />
         <result property="replyUserId"    column="reply_user_id"    />
+        <result property="replyUserName"    column="reply_user_name"    />
         <result property="content"    column="content"    />
         <result property="createTime"    column="create_time"    />
     </resultMap>
 
     <sql id="selectPsycFeedbackVo">
-        select id, user_id, type, content, images, contact, device_info, status, create_time, update_time from psyc_feedback
+        select f.id, f.user_id, u.user_name, f.type, f.content, f.images, f.contact, f.device_info, f.status, f.create_time, f.update_time 
+        from psyc_feedback f
+        left join sys_user u on f.user_id = u.user_id
     </sql>
 
     <select id="selectPsycFeedbackList" parameterType="PsycFeedback" resultMap="PsycFeedbackResult">
@@ -47,15 +51,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectPsycFeedbackById" parameterType="Long" resultMap="PsycFeedbackPsycFeedbackReplyResult">
-        select id, user_id, type, content, images, contact, device_info, status, create_time, update_time
-        from psyc_feedback
-        where id = #{id}
+        select f.id, f.user_id, u.user_name, f.type, f.content, f.images, f.contact, f.device_info, f.status, f.create_time, f.update_time
+        from psyc_feedback f
+        left join sys_user u on f.user_id = u.user_id
+        where f.id = #{id}
     </select>
 
     <select id="selectPsycFeedbackReplyList" resultMap="PsycFeedbackReplyResult">
-        select id, feedback_id, reply_user_id, content, create_time
-        from psyc_feedback_reply
-        where feedback_id = #{feedback_id}
+        select r.id, r.feedback_id, r.reply_user_id, u.user_name as reply_user_name, r.content, r.create_time
+        from psyc_feedback_reply r
+        left join sys_user u on r.reply_user_id = u.user_id
+        where r.feedback_id = #{feedback_id}
     </select>
 
     <insert id="insertPsycFeedback" parameterType="PsycFeedback" useGeneratedKeys="true" keyProperty="id">

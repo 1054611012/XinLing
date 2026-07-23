@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserAchievementMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.UserAchievement">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="achievement_id" property="achievementId" />
+        <result column="obtain_time" property="obtainTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, achievement_id, obtain_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_achievement
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectByUserAndAchievement" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_achievement
+        WHERE user_id = #{userId} AND achievement_id = #{achievementId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_achievement (user_id, achievement_id, obtain_time)
+        VALUES (#{userId}, #{achievementId}, NOW())
+    </insert>
+
+    <delete id="deleteByUserIdAndAchievement">
+        DELETE FROM user_achievement
+        WHERE user_id = #{userId} AND achievement_id = #{achievementId}
+    </delete>
+
+</mapper>

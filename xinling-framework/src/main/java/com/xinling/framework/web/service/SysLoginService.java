@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.constant.CacheConstants;
 import com.xinling.common.constant.Constants;
 import com.xinling.common.constant.UserConstants;
@@ -34,6 +35,7 @@ import com.xinling.system.service.ISysUserService;
  * @author ruoyi
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SysLoginService
 {
     @Autowired

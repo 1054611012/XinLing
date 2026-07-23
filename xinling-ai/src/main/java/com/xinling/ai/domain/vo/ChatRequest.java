@@ -35,4 +35,9 @@ public class ChatRequest {
      * 是否启用流式响应
      */
     private Boolean stream = true;
+
+    /**
+     * 语音角色（空=不合成语音）
+     */
+    private String voice;
 }

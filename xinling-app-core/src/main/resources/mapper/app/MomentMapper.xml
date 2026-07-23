@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.MomentMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.Moment">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="content" property="content" />
+        <result column="images" property="images" />
+        <result column="type" property="type" />
+        <result column="source" property="source" />
+        <result column="source_id" property="sourceId" />
+        <result column="is_anonymous" property="isAnonymous" />
+        <result column="visibility" property="visibility" />
+        <result column="like_count" property="likeCount" />
+        <result column="comment_count" property="commentCount" />
+        <result column="share_count" property="shareCount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, content, images, type, source, source_id, is_anonymous, visibility,
+        like_count, comment_count, share_count, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM moment
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectFeed" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM moment
+        WHERE is_deleted = 0 AND visibility = 0
+        <if test="type == 'following' and currentUserId != null">
+            AND user_id IN (SELECT following_id FROM user_follow WHERE follower_id = #{currentUserId})
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="selectHot" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM moment
+        WHERE is_deleted = 0 AND visibility = 0
+        ORDER BY (like_count + comment_count) DESC, create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM moment
+        <where>
+            is_deleted = 0
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO moment (user_id, content, images, type, source, source_id, is_anonymous, visibility, create_time)
+        VALUES (#{userId}, #{content}, #{images}, #{type}, #{source}, #{sourceId}, #{isAnonymous}, #{visibility}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE moment
+        <set>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="visibility != null">visibility = #{visibility},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="commentCount != null">comment_count = #{commentCount},</if>
+            <if test="shareCount != null">share_count = #{shareCount},</if>
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE moment
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementLikeCount">
+        UPDATE moment SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementLikeCount">
+        UPDATE moment SET like_count = GREATEST(0, like_count - 1) WHERE id = #{id}
+    </update>
+
+    <update id="incrementCommentCount">
+        UPDATE moment SET comment_count = comment_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementCommentCount">
+        UPDATE moment SET comment_count = GREATEST(0, comment_count - 1) WHERE id = #{id}
+    </update>
+
+    <update id="incrementShareCount">
+        UPDATE moment SET share_count = share_count + 1 WHERE id = #{id}
+    </update>
+
+    <!-- ===== 管理后台 ===== -->
+
+    <resultMap id="AdminResultMap" type="com.xinling.app.domain.model.MomentVO">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar" property="avatar" />
+        <result column="content" property="content" />
+        <result column="images" property="images" typeHandler="com.xinling.framework.typehandler.JacksonListTypeHandler" />
+        <result column="type" property="type" />
+        <result column="source" property="source" />
+        <result column="source_id" property="sourceId" />
+        <result column="is_anonymous" property="isAnonymous" />
+        <result column="visibility" property="visibility" />
+        <result column="like_count" property="likeCount" />
+        <result column="comment_count" property="commentCount" />
+        <result column="share_count" property="shareCount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="adminSelectColumns">
+        m.id, m.user_id, u.nickname, u.avatar, m.content, m.images, m.type, m.source,
+        m.source_id, m.is_anonymous, m.visibility, m.like_count, m.comment_count,
+        m.share_count, m.create_time, m.update_time, m.is_deleted
+    </sql>
+
+    <select id="selectAdminList" resultMap="AdminResultMap">
+        SELECT <include refid="adminSelectColumns" />
+        FROM moment m
+        LEFT JOIN app_user u ON m.user_id = u.id
+        <where>
+            <if test="userId != null">
+                AND m.user_id = #{userId}
+            </if>
+            <if test="content != null and content != ''">
+                AND m.content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND m.type = #{type}
+            </if>
+            <if test="visibility != null">
+                AND m.visibility = #{visibility}
+            </if>
+            <if test="isDeleted != null">
+                AND m.is_deleted = #{isDeleted}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND m.create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND m.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY m.create_time DESC
+    </select>
+
+    <select id="selectByIdRaw" resultMap="AdminResultMap">
+        SELECT <include refid="adminSelectColumns" />
+        FROM moment m
+        LEFT JOIN app_user u ON m.user_id = u.id
+        WHERE m.id = #{id}
+    </select>
+
+    <update id="restoreById">
+        UPDATE moment SET is_deleted = 0 WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByIdForce">
+        DELETE FROM moment WHERE id = #{id}
+    </delete>
+
+    <update id="updateByIdForce">
+        UPDATE moment
+        <set>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="visibility != null">visibility = #{visibility},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="commentCount != null">comment_count = #{commentCount},</if>
+            <if test="shareCount != null">share_count = #{shareCount},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

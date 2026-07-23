@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import com.xinling.common.constant.CacheConstants;
 import com.xinling.common.constant.Constants;
@@ -29,6 +30,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class TokenService {
 

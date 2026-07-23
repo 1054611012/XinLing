@@ -128,6 +128,12 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
+        <!-- Swagger OpenAPI 注解（@Tag, @Operation, @Schema 等，用于通用 DTO/实体） -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

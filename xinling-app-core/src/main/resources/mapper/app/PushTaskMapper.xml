@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.PushTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.PushTask">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="target_type" property="targetType" />
+        <result column="target_ids" property="targetIds" />
+        <result column="push_time" property="pushTime" />
+        <result column="status" property="status" />
+        <result column="success_count" property="successCount" />
+        <result column="fail_count" property="failCount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, title, content, target_type, target_ids, push_time,
+        status, success_count, fail_count, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM push_task
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM push_task
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO push_task (
+            title, content, target_type, target_ids, push_time, status
+        ) VALUES (
+            #{title}, #{content}, #{targetType}, #{targetIds}, #{pushTime}, #{status}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE push_task
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="targetType != null">target_type = #{targetType},</if>
+            <if test="targetIds != null">target_ids = #{targetIds},</if>
+            <if test="pushTime != null">push_time = #{pushTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="successCount != null">success_count = #{successCount},</if>
+            <if test="failCount != null">fail_count = #{failCount},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+</mapper>

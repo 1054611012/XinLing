@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.AppUserMapper">
+
+    <resultMap id="AppUserResult" type="com.xinling.app.domain.entity.AppUser">
+        <id column="id" property="id" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar" property="avatar" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="password_hash" property="passwordHash" />
+        <result column="gender" property="gender" />
+        <result column="birthday" property="birthday" />
+        <result column="status" property="status" />
+        <result column="vip_status" property="vipStatus" />
+        <result column="vip_end_time" property="vipEndTime" />
+        <result column="inviter_id" property="inviterId" />
+        <result column="last_login_ip" property="lastLoginIp" />
+        <result column="last_login_time" property="lastLoginTime" />
+        <result column="register_ip" property="registerIp" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, nickname, avatar, phone, email, password_hash,
+        gender, birthday, status, vip_status, vip_end_time,
+        inviter_id, last_login_ip, last_login_time, register_ip,
+        create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByPhone" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        WHERE phone = #{phone} AND is_deleted = 0
+    </select>
+
+    <select id="selectByEmail" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        WHERE email = #{email} AND is_deleted = 0
+    </select>
+
+    <select id="countByPhone" resultType="int">
+        SELECT COUNT(*) FROM app_user
+        WHERE phone = #{phone} AND is_deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO app_user (
+            nickname, avatar, phone, email, password_hash,
+            gender, birthday, status, vip_status, inviter_id,
+            register_ip, create_time
+        ) VALUES (
+            #{nickname}, #{avatar}, #{phone}, #{email}, #{passwordHash},
+            #{gender}, #{birthday}, #{status}, #{vipStatus}, #{inviterId},
+            #{registerIp}, NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE app_user
+        <set>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="passwordHash != null">password_hash = #{passwordHash},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="vipStatus != null">vip_status = #{vipStatus},</if>
+            <if test="vipEndTime != null">vip_end_time = #{vipEndTime},</if>
+            <if test="inviterId != null">inviter_id = #{inviterId},</if>
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="updateLoginInfo">
+        UPDATE app_user
+        SET last_login_ip = #{lastLoginIp},
+            last_login_time = #{lastLoginTime}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectUserList" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        <where>
+            is_deleted = 0
+            <if test="nickname != null and nickname != ''">
+                AND nickname LIKE CONCAT('%', #{nickname}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="deleteById">
+        UPDATE app_user
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- ===== 管理后台 ===== -->
+
+    <resultMap id="AdminUserResult" type="com.xinling.common.core.domain.model.AppUserAdminVO">
+        <id column="id" property="id" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar" property="avatar" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="gender" property="gender" />
+        <result column="status" property="status" />
+        <result column="vip_status" property="vipStatus" />
+        <result column="vip_end_time" property="vipEndTime" />
+        <result column="inviter_id" property="inviterId" />
+        <result column="inviter_nickname" property="inviterNickname" />
+        <result column="last_login_ip" property="lastLoginIp" />
+        <result column="last_login_time" property="lastLoginTime" />
+        <result column="register_ip" property="registerIp" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="moment_count" property="momentCount" />
+        <result column="comment_count" property="commentCount" />
+    </resultMap>
+
+    <sql id="selectAdminUserColumns">
+        u.id, u.nickname, u.avatar, u.phone, u.email, u.gender, u.status,
+        u.vip_status, u.vip_end_time,
+        u.inviter_id, inv.nickname AS inviter_nickname,
+        u.last_login_ip, u.last_login_time,
+        u.register_ip, u.create_time, u.update_time, u.is_deleted,
+        (SELECT COUNT(*) FROM moment WHERE user_id = u.id AND is_deleted = 0) AS moment_count,
+        (SELECT COUNT(*) FROM moment_comment WHERE user_id = u.id) AS comment_count
+    </sql>
+
+    <select id="selectAdminUserList" resultMap="AdminUserResult">
+        SELECT <include refid="selectAdminUserColumns" />
+        FROM app_user u
+        LEFT JOIN app_user inv ON u.inviter_id = inv.id AND inv.is_deleted = 0
+        <where>
+            <if test="nickname != null and nickname != ''">
+                AND u.nickname LIKE CONCAT('%', #{nickname}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND u.status = #{status}
+            </if>
+            <if test="vipStatus != null">
+                AND u.vip_status = #{vipStatus}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND u.create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND u.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <select id="selectAdminUserDetail" resultMap="AdminUserResult">
+        SELECT <include refid="selectAdminUserColumns" />
+        FROM app_user u
+        LEFT JOIN app_user inv ON u.inviter_id = inv.id AND inv.is_deleted = 0
+        WHERE u.id = #{id}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM app_user WHERE is_deleted = 0
+    </select>
+
+    <update id="updateUserStatus">
+        UPDATE app_user SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserVip">
+        UPDATE app_user
+        SET vip_status = #{vipStatus}, vip_end_time = #{vipEndTime}
+        WHERE id = #{id}
+    </update>
+
+    <update id="softDeleteUser">
+        UPDATE app_user SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

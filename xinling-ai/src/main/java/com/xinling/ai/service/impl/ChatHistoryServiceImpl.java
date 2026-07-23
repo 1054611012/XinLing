@@ -1,7 +1,7 @@
 package com.xinling.ai.service.impl;
 
-import com.xinling.ai.domain.entity.ChatMessage;
-import com.xinling.ai.domain.entity.ChatSession;
+import com.xinling.ai.domain.chat.ChatMessageRecord;
+import com.xinling.ai.domain.chat.ChatSession;
 import com.xinling.common.constant.RedisKeys;
 import com.xinling.mq.dto.ChatMessageDto;
 import com.xinling.ai.service.ChatHistoryService;
@@ -12,11 +12,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.xinling.common.constant.RedisKeys.SESSION_CONFIG_PREFIX;
 
 /**
- * 聊天历史记录服务实现类（安全版，支持用户映射）
+ * 聊天历史记录服务实现
+ * - 会话列表：ZSet（按 updateTime 降序），支持分页
+ * - 会话元数据：Hash（chat:session:{sessionId}）
+ * - 消息历史：List（chat:history:{sessionId}），全量加载
+ *
+ * @author SuXia
  */
 @Slf4j
 @Service
@@ -31,167 +42,233 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     @Value("${xinling.rabbitmq.chat-routing-key:chat.routing.key}")
     private String chatRoutingKey;
 
-    private static final int HISTORY_EXPIRE_DAYS = 30;
+    private static final int EXPIRE_DAYS = 30;
 
-    /*===================== Redis 类型安全工具方法 =====================*/
+    /** Hash 字段名 */
+    private static final String F_TITLE = "title";
+    private static final String F_USER_ID = "userId";
+    private static final String F_CREATE_TIME = "createTime";
+    private static final String F_UPDATE_TIME = "updateTime";
+    private static final String F_MESSAGE_COUNT = "messageCount";
 
-    public <T> List<T> safeGetCacheList(String key, Class<T> clazz) {
-        try {
-            if (redisCache.redisTemplate.hasKey(key)) {
-                String type = redisCache.redisTemplate.type(key).code();
-                if (!"list".equalsIgnoreCase(type)) {
-                    redisCache.deleteObject(key);
-                }
-            }
-            List<T> list = redisCache.getCacheList(key);
-            return list != null ? list : new ArrayList<>();
-        } catch (Exception e) {
-            log.error("安全获取 List 失败，key: {}", key, e);
-            return new ArrayList<>();
-        }
-    }
-
-    public void safeSetCacheList(String key, List<?> list) {
-        try {
-            redisCache.setCacheList(key, list);
-            redisCache.expire(key, HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
-        } catch (Exception e) {
-            log.error("安全设置 List 失败，key: {}", key, e);
-        }
-    }
-
-    /*===================== 消息历史操作 =====================*/
+    /* ===================== 消息历史 ===================== */
 
     @Override
-    public void saveMessage(String sessionId, Long userId, String userName, ChatMessage message) {
+    public void saveMessage(String sessionId, Long userId, String userName, ChatMessageRecord message) {
         try {
             String key = RedisKeys.CHAT_HISTORY + sessionId;
             redisCache.redisTemplate.opsForList().rightPush(key, message);
-            redisCache.expire(key, HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
+            redisCache.expire(key, EXPIRE_DAYS, TimeUnit.DAYS);
 
-            log.debug("保存消息到会话: {}, 内容: {}", sessionId, message.getContent());
+            updateSessionMeta(sessionId, userId);
 
-            // 直接使用传入的用户信息发送到RabbitMQ，避免调用可能耗时的getSession方法
             ChatMessageDto dto = new ChatMessageDto(sessionId, message.getRole(),
                     message.getContent(), userId, userName);
-            mqProviderService.sendChatMessage(dto);
-            log.debug("发送消息到 {} 队列，会话ID: {}, 用户ID: {}", mqProviderService.getMqType(), sessionId, userId);
+            mqProviderService.sendChatMessage(dto, dto.getSequenceNumber());
         } catch (Exception e) {
-            log.error("保存消息到 Redis 失败: {}", e.getMessage(), e);
+            log.error("保存消息失败: sessionId={}", sessionId, e);
         }
     }
 
     @Override
-    public List<ChatMessage> getHistoryMessages(String sessionId) {
+    public List<ChatMessageRecord> getHistoryMessages(String sessionId) {
         String key = RedisKeys.CHAT_HISTORY + sessionId;
-        List<ChatMessage> messages = safeGetCacheList(key, ChatMessage.class);
-        redisCache.expire(key, HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
-        return messages;
+        try {
+            if (Boolean.TRUE.equals(redisCache.redisTemplate.hasKey(key))) {
+                List<ChatMessageRecord> list = redisCache.getCacheList(key);
+                redisCache.expire(key, EXPIRE_DAYS, TimeUnit.DAYS);
+                return list != null ? list : new ArrayList<>();
+            }
+        } catch (Exception e) {
+            log.error("获取消息历史失败: sessionId={}", sessionId, e);
+        }
+        return new ArrayList<>();
     }
 
-    /*===================== 会话操作 =====================*/
+    /* ===================== 会话操作 ===================== */
+
+    private String hashKey(String sessionId) {
+        return RedisKeys.CHAT_SESSION_PREFIX + sessionId;
+    }
 
     @Override
     public void saveSession(ChatSession session) {
         try {
-            String titleKey = RedisKeys.CHAT_TITLE + session.getSessionId();
-            String title = session.getTitle();
-            if (title == null || title.isEmpty()) {
-                List<ChatMessage> messages = getHistoryMessages(session.getSessionId());
-                if (!messages.isEmpty()) {
-                    title = messages.get(0).getContent();
-                }
-            }
-            if (title != null && !title.isEmpty()) {
-                redisCache.setCacheObject(titleKey, title, HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
-            }
+            Map<String, Object> meta = new LinkedHashMap<>();
+            String now = nowStr();
+            meta.put(F_TITLE, session.getTitle() != null ? session.getTitle() : "");
+            meta.put(F_USER_ID, String.valueOf(session.getUserId()));
+            meta.put(F_CREATE_TIME, now);
+            meta.put(F_UPDATE_TIME, now);
+            meta.put(F_MESSAGE_COUNT, "0");
 
-            // 用户会话列表
-            String userSessionsKey = RedisKeys.CHAT_USER_SESSIONS + session.getUserId();
-            List<String> sessionIds = safeGetCacheList(userSessionsKey, String.class);
-            sessionIds.remove(session.getSessionId());
-            sessionIds.add(0, session.getSessionId());
-            safeSetCacheList(userSessionsKey, sessionIds);
+            String hk = hashKey(session.getSessionId());
+            redisCache.redisTemplate.opsForHash().putAll(hk, meta);
+            redisCache.expire(hk, EXPIRE_DAYS, TimeUnit.DAYS);
 
-            // 映射 sessionId -> userId
-            String sessionUserKey = RedisKeys.SESSION_USER_PREFIX + session.getSessionId();
-            redisCache.setCacheObject(sessionUserKey, session.getUserId(), HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
-
-            log.debug("保存会话: {}, 用户ID: {}, 标题: {}", session.getSessionId(), session.getUserId(), title);
+            addToUserZSet(session.getUserId(), session.getSessionId(), now);
         } catch (Exception e) {
-            log.error("保存会话到 Redis 失败: {}", e.getMessage(), e);
+            log.error("保存会话失败: sessionId={}", session.getSessionId(), e);
         }
     }
 
     @Override
-    public List<ChatSession> getUserSessions(Long userId) {
-        String userSessionsKey = RedisKeys.CHAT_USER_SESSIONS + userId;
-        List<String> sessionIds = safeGetCacheList(userSessionsKey, String.class);
-        List<ChatSession> sessions = new ArrayList<>();
-        for (String sessionId : sessionIds) {
-            String title = redisCache.getCacheObject(RedisKeys.CHAT_TITLE + sessionId);
-            ChatSession session = new ChatSession();
-            session.setSessionId(sessionId);
-            session.setUserId(userId);
-            session.setTitle(title);
-            sessions.add(session);
+    public SessionPageResult getUserSessions(Long userId, int page, int size) {
+        String key = RedisKeys.CHAT_USER_SESSIONS + userId;
+        Long total = redisCache.redisTemplate.opsForZSet().size(key);
+        if (total == null || total == 0) {
+            return new SessionPageResult(new ArrayList<>(), 0);
         }
-        return sessions;
+
+        long start = (long) (page - 1) * size;
+        long end = start + size - 1;
+        Set<String> ids = redisCache.redisTemplate.opsForZSet()
+                .reverseRange(key, start, end);
+
+        if (ids == null || ids.isEmpty()) {
+            return new SessionPageResult(new ArrayList<>(), total);
+        }
+
+        List<ChatSession> sessions = ids.stream()
+                .map(this::buildFromHash)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return new SessionPageResult(sessions, total);
     }
 
     @Override
     public ChatSession getSession(String sessionId) {
-        try {
-            String sessionUserKey = RedisKeys.SESSION_USER_PREFIX + sessionId;
-            Long userId = redisCache.getCacheObject(sessionUserKey);
-            if (userId == null) return null;
-
-            String title = redisCache.getCacheObject(RedisKeys.CHAT_TITLE + sessionId);
-            ChatSession session = new ChatSession();
-            session.setSessionId(sessionId);
-            session.setUserId(userId);
-            session.setTitle(title);
-            return session;
-        } catch (Exception e) {
-            log.error("从 Redis 获取会话失败: {}", e.getMessage(), e);
-            return null;
-        }
+        return buildFromHash(sessionId);
     }
 
     @Override
     public void deleteSession(String sessionId) {
-        ChatSession session = getSession(sessionId);
-        if (session == null) {
-            log.warn("尝试删除不存在的会话: {}", sessionId);
-            return;
+        try {
+            String hk = hashKey(sessionId);
+            Object uid = redisCache.redisTemplate.opsForHash().get(hk, F_USER_ID);
+
+            redisCache.deleteObject(RedisKeys.CHAT_HISTORY + sessionId);
+            redisCache.deleteObject(RedisKeys.SESSION_CONFIG_PREFIX + sessionId);
+            redisCache.deleteObject(hk);
+
+            if (uid != null) {
+                redisCache.redisTemplate.opsForZSet().remove(
+                        RedisKeys.CHAT_USER_SESSIONS + Long.valueOf(uid.toString()), sessionId);
+            }
+        } catch (Exception e) {
+            log.error("删除会话失败: sessionId={}", sessionId, e);
         }
-
-        redisCache.deleteObject(RedisKeys.CHAT_HISTORY + sessionId);
-        redisCache.deleteObject(RedisKeys.CHAT_TITLE + sessionId);
-        redisCache.deleteObject(RedisKeys.SESSION_USER_PREFIX + sessionId);
-
-        String userSessionsKey = RedisKeys.CHAT_USER_SESSIONS + session.getUserId();
-        List<String> sessionIds = safeGetCacheList(userSessionsKey, String.class);
-        sessionIds.remove(sessionId);
-        safeSetCacheList(userSessionsKey, sessionIds);
-
-        log.debug("删除会话: {}, 用户ID: {}", sessionId, session.getUserId());
     }
 
     @Override
     public void updateSessionTitle(String sessionId, String title) {
-        ChatSession session = getSession(sessionId);
-        if (session != null) {
-            redisCache.setCacheObject(RedisKeys.CHAT_TITLE + sessionId, title, HISTORY_EXPIRE_DAYS, TimeUnit.DAYS);
-            saveSession(session);
-            log.debug("更新会话标题: {}, 用户ID: {}, 新标题: {}", sessionId, session.getUserId(), title);
+        try {
+            String hk = hashKey(sessionId);
+            redisCache.redisTemplate.opsForHash().put(hk, F_TITLE, title);
+            redisCache.expire(hk, EXPIRE_DAYS, TimeUnit.DAYS);
+
+            String now = nowStr();
+            redisCache.redisTemplate.opsForHash().put(hk, F_UPDATE_TIME, now);
+
+            Object uid = redisCache.redisTemplate.opsForHash().get(hk, F_USER_ID);
+            if (uid != null) {
+                addToUserZSet(Long.valueOf(uid.toString()), sessionId, now);
+            }
+        } catch (Exception e) {
+            log.error("更新标题失败: sessionId={}", sessionId, e);
         }
     }
 
     @Override
     public boolean isSessionBelongsToUser(String sessionId, Long userId) {
-        String sessionUserKey = RedisKeys.SESSION_USER_PREFIX + sessionId;
-        Long storedUserId = redisCache.getCacheObject(sessionUserKey);
-        return storedUserId != null && storedUserId.equals(userId);
+        try {
+            Double score = redisCache.redisTemplate.opsForZSet()
+                    .score(RedisKeys.CHAT_USER_SESSIONS + userId, sessionId);
+            return score != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void saveSessionConfigMapping(String sessionId, Long configId) {
+        try {
+            redisCache.setCacheObject(SESSION_CONFIG_PREFIX + sessionId, configId, EXPIRE_DAYS, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.error("保存配置映射失败: sessionId={}", sessionId, e);
+        }
+    }
+
+    @Override
+    public Long getSessionConfigId(String sessionId) {
+        try {
+            return redisCache.getCacheObject(SESSION_CONFIG_PREFIX + sessionId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /* ===================== 内部方法 ===================== */
+
+    private ChatSession buildFromHash(String sessionId) {
+        try {
+            Map<Object, Object> entries = redisCache.redisTemplate.opsForHash().entries(hashKey(sessionId));
+            if (entries == null || entries.isEmpty()) {
+                return null;
+            }
+            ChatSession s = new ChatSession();
+            s.setSessionId(sessionId);
+            s.setTitle(str(entries, F_TITLE));
+            s.setUserId(lng(entries, F_USER_ID));
+            if (entries.containsKey(F_CREATE_TIME)) {
+                s.setCreateTime(LocalDateTime.parse(str(entries, F_CREATE_TIME), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            }
+            if (entries.containsKey(F_UPDATE_TIME)) {
+                s.setUpdateTime(LocalDateTime.parse(str(entries, F_UPDATE_TIME), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            }
+            return s;
+        } catch (Exception e) {
+            log.warn("从 Hash 构建会话失败: sessionId={}", sessionId, e);
+            return null;
+        }
+    }
+
+    private void addToUserZSet(Long userId, String sessionId, String timeStr) {
+        try {
+            double score = LocalDateTime.parse(timeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            redisCache.zAdd(RedisKeys.CHAT_USER_SESSIONS + userId, sessionId, score, EXPIRE_DAYS, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.error("ZSet 添加失败: sessionId={}", sessionId, e);
+        }
+    }
+
+    private void updateSessionMeta(String sessionId, Long userId) {
+        try {
+            String hk = hashKey(sessionId);
+            String now = nowStr();
+            redisCache.redisTemplate.opsForHash().put(hk, F_UPDATE_TIME, now);
+            redisCache.redisTemplate.opsForHash().increment(hk, F_MESSAGE_COUNT, 1);
+            redisCache.expire(hk, EXPIRE_DAYS, TimeUnit.DAYS);
+            addToUserZSet(userId, sessionId, now);
+        } catch (Exception e) {
+            log.warn("更新会话元数据失败: sessionId={}", sessionId, e);
+        }
+    }
+
+    private static String nowStr() {
+        return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    private static String str(Map<Object, Object> m, String k) {
+        Object v = m.get(k);
+        return v != null ? v.toString() : null;
+    }
+
+    private static Long lng(Map<Object, Object> m, String k) {
+        Object v = m.get(k);
+        if (v == null) return null;
+        try { return Long.valueOf(v.toString()); } catch (NumberFormatException e) { return null; }
     }
 }

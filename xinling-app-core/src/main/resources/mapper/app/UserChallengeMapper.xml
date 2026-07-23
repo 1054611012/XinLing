@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserChallengeMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.UserChallenge">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="challenge_id" property="challengeId" />
+        <result column="join_time" property="joinTime" />
+        <result column="current_day" property="currentDay" />
+        <result column="completed_days" property="completedDays" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, challenge_id, join_time, current_day, completed_days, status, create_time, update_time
+    </sql>
+
+    <select id="selectByUserAndChallenge" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_challenge
+        WHERE user_id = #{userId} AND challenge_id = #{challengeId}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_challenge
+        WHERE user_id = #{userId}
+        ORDER BY join_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_challenge (user_id, challenge_id, join_time, current_day, completed_days, status)
+        VALUES (#{userId}, #{challengeId}, NOW(), 0, 0, 0)
+    </insert>
+
+    <update id="updateById">
+        UPDATE user_challenge
+        <set>
+            <if test="currentDay != null">current_day = #{currentDay},</if>
+            <if test="completedDays != null">completed_days = #{completedDays},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="countByChallengeId" resultType="int">
+        SELECT COUNT(*) FROM user_challenge WHERE challenge_id = #{challengeId}
+    </select>
+
+</mapper>

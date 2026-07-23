@@ -34,14 +34,14 @@ public class ChatMessageService {
             if (chatMessageDto.getSequenceNumber() == null) {
                 chatMessageDto.setSequenceNumber(System.currentTimeMillis());
             }
-            
+
             rabbitTemplate.convertAndSend("chat.exchange", chatRoutingKey, chatMessageDto);
             log.debug("发送消息到RabbitMQ队列，会话ID: {}, 序列号: {}", chatMessageDto.getSessionId(), chatMessageDto.getSequenceNumber());
         } catch (Exception e) {
             log.error("发送聊天消息到队列失败: {}", e.getMessage(), e);
         }
     }
-    
+
     /**
      * 发送聊天消息到队列（带自定义序列号）
      *

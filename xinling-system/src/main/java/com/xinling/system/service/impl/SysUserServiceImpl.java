@@ -16,6 +16,7 @@ import com.xinling.common.constant.UserConstants;
 import com.xinling.common.core.domain.entity.SysRole;
 import com.xinling.common.core.domain.entity.SysUser;
 import com.xinling.common.exception.ServiceException;
+import com.xinling.common.utils.ActivityLogUtils;
 import com.xinling.common.utils.SecurityUtils;
 import com.xinling.common.utils.StringUtils;
 import com.xinling.common.utils.bean.BeanValidators;
@@ -267,6 +268,11 @@ public class SysUserServiceImpl implements ISysUserService
         insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
+        
+        // 记录活动日志(异步,不阻塞主流程)
+        ActivityLogUtils.recordUserActivity("新建用户", 
+            String.format("管理员创建了新用户：%s", user.getUserName()), user.getUserId());
+        
         return rows;
     }
 

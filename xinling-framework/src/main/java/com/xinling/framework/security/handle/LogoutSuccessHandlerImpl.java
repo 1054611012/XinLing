@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import com.alibaba.fastjson2.JSON;
@@ -25,6 +26,7 @@ import com.xinling.framework.web.service.TokenService;
  * @author xinling
  */
 @Configuration
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler
 {
     @Autowired

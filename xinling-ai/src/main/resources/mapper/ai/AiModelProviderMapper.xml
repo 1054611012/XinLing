@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.AiModelProviderMapper">
+
+    <resultMap type="com.xinling.ai.domain.config.AiModelProvider" id="AiModelProviderResult">
+        <result property="providerId"    column="provider_id"    />
+        <result property="providerName"    column="provider_name"    />
+        <result property="providerCode"    column="provider_code"    />
+        <result property="providerType"    column="provider_type"    />
+        <result property="apiBaseUrl"    column="api_base_url"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectAiModelProviderVo">
+        select provider_id, provider_name, provider_code, provider_type, api_base_url, 
+               sort_order, status, remark, create_by, create_time, update_by, update_time 
+        from ai_model_provider
+    </sql>
+
+    <select id="selectAiModelProviderList" parameterType="com.xinling.ai.domain.config.AiModelProvider" resultMap="AiModelProviderResult">
+        <include refid="selectAiModelProviderVo"/>
+        <where>
+            <if test="providerName != null and providerName != ''">
+                AND provider_name like concat('%', #{providerName}, '%')
+            </if>
+            <if test="providerCode != null and providerCode != ''">
+                AND provider_code = #{providerCode}
+            </if>
+            <if test="providerType != null and providerType != ''">
+                AND provider_type = #{providerType}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by sort_order, provider_id
+    </select>
+
+    <select id="selectAiModelProviderById" parameterType="Long" resultMap="AiModelProviderResult">
+        <include refid="selectAiModelProviderVo"/>
+        where provider_id = #{providerId}
+    </select>
+
+    <select id="selectAiModelProviderByCode" parameterType="String" resultMap="AiModelProviderResult">
+        <include refid="selectAiModelProviderVo"/>
+        where provider_code = #{providerCode}
+    </select>
+
+    <insert id="insertAiModelProvider" parameterType="com.xinling.ai.domain.config.AiModelProvider" useGeneratedKeys="true" keyProperty="providerId">
+        insert into ai_model_provider
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="providerName != null and providerName != ''">provider_name,</if>
+            <if test="providerCode != null and providerCode != ''">provider_code,</if>
+            <if test="providerType != null and providerType != ''">provider_type,</if>
+            <if test="apiBaseUrl != null and apiBaseUrl != ''">api_base_url,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="providerName != null and providerName != ''">#{providerName},</if>
+            <if test="providerCode != null and providerCode != ''">#{providerCode},</if>
+            <if test="providerType != null and providerType != ''">#{providerType},</if>
+            <if test="apiBaseUrl != null and apiBaseUrl != ''">#{apiBaseUrl},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateAiModelProvider" parameterType="com.xinling.ai.domain.config.AiModelProvider">
+        update ai_model_provider
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="providerName != null and providerName != ''">provider_name = #{providerName},</if>
+            <if test="providerCode != null and providerCode != ''">provider_code = #{providerCode},</if>
+            <if test="providerType != null and providerType != ''">provider_type = #{providerType},</if>
+            <if test="apiBaseUrl != null and apiBaseUrl != ''">api_base_url = #{apiBaseUrl},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where provider_id = #{providerId}
+    </update>
+
+    <delete id="deleteAiModelProviderById" parameterType="Long">
+        delete from ai_model_provider where provider_id = #{providerId}
+    </delete>
+
+    <delete id="deleteAiModelProviderByIds" parameterType="Long">
+        delete from ai_model_provider where provider_id in
+        <foreach item="providerId" collection="array" open="(" separator="," close=")">
+            #{providerId}
+        </foreach>
+    </delete>
+
+    <select id="checkProviderCodeUnique" resultMap="AiModelProviderResult">
+        <include refid="selectAiModelProviderVo"/>
+        where provider_code = #{providerCode}
+        <if test="providerId != null and providerId != 0">
+            and provider_id != #{providerId}
+        </if>
+        limit 1
+    </select>
+
+</mapper>

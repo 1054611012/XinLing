@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyInstanceValueMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyInstanceValue" id="OntologyInstanceValueResult">
+        <result property="valueId"    column="value_id"    />
+        <result property="instanceId"    column="instance_id"    />
+        <result property="propertyId"    column="property_id"    />
+        <result property="propertyName"    column="property_name"    />
+        <result property="propertyValue"    column="property_value"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyInstanceValueVo">
+        select v.value_id, v.instance_id, v.property_id,
+               p.property_name as property_name, v.property_value,
+               v.create_by, v.create_time, v.update_by, v.update_time
+        from ai_ontology_instance_value v
+        left join ai_ontology_property p on v.property_id = p.property_id
+    </sql>
+
+    <select id="selectOntologyInstanceValueList" parameterType="com.xinling.ai.domain.ontology.OntologyInstanceValue" resultMap="OntologyInstanceValueResult">
+        <include refid="selectOntologyInstanceValueVo"/>
+        <where>
+            <if test="instanceId != null">
+                AND v.instance_id = #{instanceId}
+            </if>
+            <if test="propertyId != null">
+                AND v.property_id = #{propertyId}
+            </if>
+        </where>
+        order by v.value_id
+    </select>
+
+    <select id="selectOntologyInstanceValueById" parameterType="Long" resultMap="OntologyInstanceValueResult">
+        <include refid="selectOntologyInstanceValueVo"/>
+        where v.value_id = #{valueId}
+    </select>
+
+    <select id="selectValuesByInstanceId" parameterType="Long" resultMap="OntologyInstanceValueResult">
+        <include refid="selectOntologyInstanceValueVo"/>
+        where v.instance_id = #{instanceId}
+        order by p.sort_order, v.value_id
+    </select>
+
+    <insert id="insertOntologyInstanceValue" parameterType="com.xinling.ai.domain.ontology.OntologyInstanceValue" useGeneratedKeys="true" keyProperty="valueId">
+        insert into ai_ontology_instance_value
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="instanceId != null">instance_id,</if>
+            <if test="propertyId != null">property_id,</if>
+            <if test="propertyValue != null">property_value,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="instanceId != null">#{instanceId},</if>
+            <if test="propertyId != null">#{propertyId},</if>
+            <if test="propertyValue != null">#{propertyValue},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyInstanceValue" parameterType="com.xinling.ai.domain.ontology.OntologyInstanceValue">
+        update ai_ontology_instance_value
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="propertyValue != null">property_value = #{propertyValue},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where value_id = #{valueId}
+    </update>
+
+    <delete id="deleteOntologyInstanceValueById" parameterType="Long">
+        delete from ai_ontology_instance_value where value_id = #{valueId}
+    </delete>
+
+    <delete id="deleteOntologyInstanceValueByIds" parameterType="Long">
+        delete from ai_ontology_instance_value where value_id in
+        <foreach item="valueId" collection="array" open="(" separator="," close=")">
+            #{valueId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteValuesByInstanceId" parameterType="Long">
+        delete from ai_ontology_instance_value where instance_id = #{instanceId}
+    </delete>
+
+</mapper>

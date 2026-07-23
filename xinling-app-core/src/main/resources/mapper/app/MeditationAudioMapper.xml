@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.MeditationAudioMapper">
+
+    <resultMap id="MeditationAudioWithJoinResult" type="com.xinling.app.domain.entity.MeditationAudio">
+        <id column="id" property="id" />
+        <result column="meditation_id" property="meditationId" />
+        <result column="audio_item_id" property="audioItemId" />
+        <result column="author_id" property="authorId" />
+        <result column="sort_order" property="sortOrder" />
+        <association property="audioItem" javaType="com.xinling.app.domain.entity.AudioItem">
+            <id column="ai_id" property="id" />
+            <result column="ai_file_id" property="fileId" />
+            <result column="ai_title" property="title" />
+            <result column="ai_audio_url" property="audioUrl" />
+            <result column="ai_duration" property="duration" />
+            <result column="ai_file_type" property="fileType" />
+            <result column="ai_file_ext" property="fileExt" />
+            <result column="ai_source_type" property="sourceType" />
+            <result column="ai_narrator" property="narrator" />
+            <result column="ai_play_count" property="playCount" />
+            <result column="ai_tags" property="tags"
+                     typeHandler="com.xinling.framework.typehandler.JacksonListTypeHandler" />
+            <result column="ai_status" property="status" />
+            <result column="ai_sort_order" property="sortOrder" />
+        </association>
+        <association property="teacher" javaType="com.xinling.app.domain.entity.Teacher">
+            <id column="t_id" property="id" />
+            <result column="t_name" property="name" />
+            <result column="t_avatar" property="avatar" />
+        </association>
+    </resultMap>
+
+    <sql id="selectJoinVo">
+        SELECT ma.id, ma.meditation_id, ma.audio_item_id, ma.author_id, ma.sort_order,
+               ai.id       AS ai_id,
+               ai.file_id  AS ai_file_id,
+               ai.title    AS ai_title,
+               ai.audio_url AS ai_audio_url,
+               ai.duration AS ai_duration,
+               ai.file_type AS ai_file_type,
+               ai.file_ext AS ai_file_ext,
+               ai.source_type AS ai_source_type,
+               ai.narrator AS ai_narrator,
+               ai.play_count AS ai_play_count,
+               ai.tags     AS ai_tags,
+               ai.status   AS ai_status,
+               ai.sort_order AS ai_sort_order,
+               t.id        AS t_id,
+               t.name      AS t_name,
+               t.avatar    AS t_avatar
+        FROM meditation_audio ma
+        LEFT JOIN audio_item ai ON ai.id = ma.audio_item_id AND ai.is_deleted = 0
+        LEFT JOIN teacher t ON t.id = ma.author_id
+    </sql>
+
+    <select id="selectByMeditationId" resultMap="MeditationAudioWithJoinResult">
+        <include refid="selectJoinVo" />
+        WHERE ma.meditation_id = #{meditationId}
+        ORDER BY ma.sort_order ASC, ma.id ASC
+    </select>
+
+    <select id="batchSelectByMeditationIds" resultMap="MeditationAudioWithJoinResult">
+        <include refid="selectJoinVo" />
+        WHERE ma.meditation_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        ORDER BY ma.sort_order ASC, ma.id ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meditation_audio (meditation_id, audio_item_id, author_id, sort_order)
+        VALUES (#{meditationId}, #{audioItemId}, #{authorId}, #{sortOrder})
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO meditation_audio (meditation_id, audio_item_id, author_id, sort_order) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.meditationId}, #{item.audioItemId}, #{item.authorId}, #{item.sortOrder})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByMeditationId">
+        DELETE FROM meditation_audio WHERE meditation_id = #{meditationId}
+    </delete>
+
+</mapper>

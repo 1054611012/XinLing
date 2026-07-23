@@ -24,11 +24,10 @@
             <optional>true</optional> <!-- 表示依赖不会传递 -->
         </dependency>
 
-        <!-- SpringDoc OpenAPI-->
+        <!-- Knife4j OpenAPI (增强版 Swagger UI) -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.7.0</version>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
          <!-- Mysql驱动包 -->
@@ -70,6 +69,13 @@
         <dependency>
             <groupId>com.xinling</groupId>
             <artifactId>xinling-ai</artifactId>
+            <version>${xinling.version}</version>
+        </dependency>
+
+        <!-- 移动端核心模块 -->
+        <dependency>
+            <groupId>com.xinling</groupId>
+            <artifactId>xinling-app-core</artifactId>
             <version>${xinling.version}</version>
         </dependency>
         <dependency>

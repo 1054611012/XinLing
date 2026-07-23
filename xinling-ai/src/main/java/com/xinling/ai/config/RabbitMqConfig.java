@@ -1,5 +1,6 @@
 package com.xinling.ai.config;
 
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -32,20 +33,16 @@ public class RabbitMqConfig {
      * 配置RabbitMQ监听器容器工厂，用于AI模块的消息监听
      */
     @Bean("rabbitListenerContainerFactory")
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
+                                                                               MessageConverter messageConverter) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(messageConverter());
+        factory.setMessageConverter(messageConverter); // 使用xinling-mq模块中定义的messageConverter
         factory.setConcurrentConsumers(concurrency); // 单个消费者确保顺序消费
         factory.setMaxConcurrentConsumers(maxConcurrency); // 最大并发消费者数量
-        factory.setAcknowledgeMode(org.springframework.amqp.core.AcknowledgeMode.MANUAL); // 手动ACK模式
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL); // 手动ACK模式
         factory.setPrefetchCount(prefetchCount); // 每次只预取一条消息
         factory.setDefaultRequeueRejected(true); // 拒绝的消息重新入队
         return factory;
-    }
-
-    @Bean
-    public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
     }
 }

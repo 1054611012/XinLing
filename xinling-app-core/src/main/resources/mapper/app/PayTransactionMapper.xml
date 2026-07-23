@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.PayTransactionMapper">
+
+    <resultMap id="PayTransactionResult" type="com.xinling.app.domain.entity.PayTransaction">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="transaction_id" property="transactionId" />
+        <result column="pay_type" property="payType" />
+        <result column="amount" property="amount" />
+        <result column="status" property="status" />
+        <result column="pay_time" property="payTime" />
+        <result column="raw_data" property="rawData" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, order_no, transaction_id, pay_type, amount,
+        status, pay_time, raw_data, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="PayTransactionResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_transaction
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByOrderNo" resultMap="PayTransactionResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_transaction
+        WHERE order_no = #{orderNo}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectByTransactionId" resultMap="PayTransactionResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_transaction
+        WHERE transaction_id = #{transactionId}
+    </select>
+
+    <select id="selectListByOrderNo" resultMap="PayTransactionResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_transaction
+        WHERE order_no = #{orderNo}
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO pay_transaction (
+            order_no, transaction_id, pay_type, amount,
+            status, pay_time, raw_data
+        ) VALUES (
+            #{orderNo}, #{transactionId}, #{payType}, #{amount},
+            #{status}, #{payTime}, #{rawData}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE pay_transaction
+        <set>
+            <if test="transactionId != null">transaction_id = #{transactionId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="rawData != null">raw_data = #{rawData},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE pay_transaction
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectList" resultMap="PayTransactionResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_transaction
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="payType != null and payType != ''">
+                AND pay_type = #{payType}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.constant.CacheConstants;
 import com.xinling.common.core.domain.entity.SysUser;
 import com.xinling.common.core.redis.RedisCache;
@@ -19,6 +20,7 @@ import com.xinling.framework.security.context.AuthenticationContextHolder;
  * @author xinling
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SysPasswordService
 {
     @Autowired

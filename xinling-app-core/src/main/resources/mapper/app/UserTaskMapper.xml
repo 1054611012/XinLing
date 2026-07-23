@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.UserTask">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="task_id" property="taskId" />
+        <result column="date" property="date" />
+        <result column="progress" property="progress" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, task_id, date, progress, status
+    </sql>
+
+    <select id="selectByUserTaskAndDate" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_task
+        WHERE user_id = #{userId} AND task_id = #{taskId} AND date = #{date}
+    </select>
+
+    <select id="selectByUserIdAndDate" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_task
+        WHERE user_id = #{userId} AND date = #{date}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_task (user_id, task_id, date, progress, status)
+        VALUES (#{userId}, #{taskId}, #{date}, #{progress}, #{status})
+    </insert>
+
+    <update id="updateById">
+        UPDATE user_task
+        <set>
+            <if test="progress != null">progress = #{progress},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

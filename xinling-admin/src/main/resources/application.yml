@@ -8,7 +8,7 @@ xinling:
   # 文件路径
   # Windows: D:/xinling/uploadPath
   # Linux: /home/xinling/uploadPath
-  profile: /Volumes/Suxia/IdeaProjects
+  profile: /Volumes/Suxia/IdeaProjects/XinLing
 
   # 系统设置
   addressEnabled: false  # 获取IP地址开关
@@ -54,6 +54,11 @@ server:
     threads:
       max: 800
       min-spare: 100
+    # 优雅关闭配置
+    graceful-shutdown: true
+  # 应用关闭配置
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 # 用户配置
 user:
@@ -71,7 +76,8 @@ ai:
   ollama:
     base-url: http://localhost:11434
     api-key: ollama
-    model: qwen2.5:3b
+    chat-model: qwen2.5:3b
+    embedding-model: nomic-embed-text
     timeout-seconds: 360
 
   deepseek:
@@ -86,11 +92,19 @@ ai:
     model: gpt-4o-mini
 
   rag:
-    knowledge-base-path: /Volumes/Suxia/IdeaProjects/XingLing-Vue/knowledge-base
-    max-results: 3
-    min-score: 0.5
+    knowledge-base-path: /Volumes/Suxia/IdeaProjects/XinLing/knowledge-base
+    max-results: 5
+    min-score: 0.3
     chunk-size: 500
     chunk-overlap: 0
+    vector-store-path: /Volumes/Suxia/IdeaProjects/XinLing/vector-store
+    enable-initialization: true
+
+  langfuse:
+    enabled: false
+    host: http://localhost:3000
+    public-key: ${LANGFUSE_PUBLIC_KEY:}
+    secret-key: ${LANGFUSE_SECRET_KEY:}
 
 # Spring 核心配置
 spring:
@@ -181,17 +195,23 @@ pagehelper:
 springdoc:
   api-docs:
     enabled: ${swagger.enabled:true}
-    path: /v3/api-docs
-  swagger-ui:
-    enabled: ${swagger.enabled:true}
-    path: /swagger-ui.html
   group-configs:
     - group: default
       paths-to-match: /**
       packages-to-scan: com.xinling
-  show-actuator: true
-  server:
-    base-path: ${swagger.pathMapping:/dev-api}
+
+# Knife4j 配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enableSwaggerModels: true
+    swaggerModelName: 实体类
+    enableDocumentManage: true
+    enableRequestCache: true
+    enableDebug: true
+    enableSearch: true
+    enableFooter: false
 
 # 安全防护配置
 xss:
@@ -202,6 +222,8 @@ xss:
 # 日志配置
 logging:
   level:
-    com.xinling.web.controller.api.RemindController: INFO
+    com.xinling.admin.controller.api.RemindController: INFO
     com.xinling: DEBUG
     org.springframework: WARN
+    org.apache.coyote: INFO
+    org.apache.tomcat: INFO

@@ -161,9 +161,12 @@ public class Constants
     public static final String[] JSON_WHITELIST_STR = { "com.xinling" };
 
     /**
-     * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
+     * 定时任务白名单配置(仅允许访问的包名,如其他需要可以自行添加)
      */
-    public static final String[] JOB_WHITELIST_STR = { "com.xinling.quartz.task" };
+    public static final String[] JOB_WHITELIST_STR = { 
+        "com.xinling.quartz.task",           // Quartz模块任务
+        "com.xinling.admin.controller.task"     // Admin模块任务(需要访问framework/system模块)
+    };
 
     /**
      * 定时任务违规的字符

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.WhitelistMapper">
+
+    <resultMap id="WhitelistResult" type="com.xinling.app.domain.entity.Whitelist">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="identifier" property="identifier" />
+        <result column="description" property="description" />
+        <result column="status" property="status" />
+        <result column="expire_time" property="expireTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, type, identifier, description, status, expire_time, create_time, update_time
+    </sql>
+
+    <select id="selectByTypeAndIdentifier" resultMap="WhitelistResult">
+        SELECT <include refid="selectColumns" />
+        FROM whitelist
+        WHERE type = #{type}
+          AND identifier = #{identifier}
+          AND status = 1
+          AND (expire_time IS NULL OR expire_time &gt;= NOW())
+        LIMIT 1
+    </select>
+
+    <select id="selectList" resultMap="WhitelistResult">
+        SELECT <include refid="selectColumns" />
+        FROM whitelist
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO whitelist (
+            type, identifier, description, status, expire_time
+        ) VALUES (
+            #{type}, #{identifier}, #{description}, #{status}, #{expireTime}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE whitelist
+        <set>
+            <if test="type != null">type = #{type},</if>
+            <if test="identifier != null">identifier = #{identifier},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="expireTime != null">expire_time = #{expireTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM whitelist
+        WHERE id = #{id}
+    </delete>
+</mapper>

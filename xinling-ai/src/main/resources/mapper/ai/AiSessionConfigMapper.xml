@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.AiSessionConfigMapper">
+
+    <resultMap type="com.xinling.ai.domain.config.AiSessionConfig" id="AiSessionConfigResult">
+        <result property="configId"    column="config_id"    />
+        <result property="configName"    column="config_name"    />
+        <result property="configKey"    column="config_key"    />
+        <result property="chatModelId"    column="chat_model_id"    />
+        <result property="chatModelName"    column="chat_model_name"    />
+        <result property="embeddingModelId"    column="embedding_model_id"    />
+        <result property="embeddingModelName"    column="embedding_model_name"    />
+        <result property="maxHistoryMessages"    column="max_history_messages"    />
+        <result property="enableRag"    column="enable_rag"    />
+        <result property="ragMaxResults"    column="rag_max_results"    />
+        <result property="ragMinScore"    column="rag_min_score"    />
+        <result property="isDefault"    column="is_default"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectAiSessionConfigVo">
+        select sc.config_id, sc.config_name, sc.config_key, sc.chat_model_id, cm.model_name as chat_model_name,
+               sc.embedding_model_id, em.model_name as embedding_model_name,
+               sc.max_history_messages, sc.enable_rag, sc.rag_max_results, sc.rag_min_score,
+               sc.is_default, sc.status, sc.remark,
+               sc.create_by, sc.create_time, sc.update_by, sc.update_time
+        from ai_session_config sc
+        left join ai_model_config cm on sc.chat_model_id = cm.model_id
+        left join ai_model_config em on sc.embedding_model_id = em.model_id
+    </sql>
+
+    <select id="selectAiSessionConfigList" parameterType="com.xinling.ai.domain.config.AiSessionConfig" resultMap="AiSessionConfigResult">
+        <include refid="selectAiSessionConfigVo"/>
+        <where>
+            <if test="configName != null and configName != ''">
+                AND sc.config_name like concat('%', #{configName}, '%')
+            </if>
+            <if test="chatModelId != null">
+                AND sc.chat_model_id = #{chatModelId}
+            </if>
+            <if test="isDefault != null and isDefault != ''">
+                AND sc.is_default = #{isDefault}
+            </if>
+            <if test="status != null and status != ''">
+                AND sc.status = #{status}
+            </if>
+        </where>
+        order by sc.config_id
+    </select>
+
+    <select id="selectAiSessionConfigById" parameterType="Long" resultMap="AiSessionConfigResult">
+        <include refid="selectAiSessionConfigVo"/>
+        where sc.config_id = #{configId}
+    </select>
+
+    <select id="selectDefaultSessionConfig" resultMap="AiSessionConfigResult">
+        <include refid="selectAiSessionConfigVo"/>
+        where sc.is_default = '1' and sc.status = '0'
+        limit 1
+    </select>
+
+    <select id="selectByConfigKey" resultMap="AiSessionConfigResult">
+        <include refid="selectAiSessionConfigVo"/>
+        where sc.config_key = #{configKey} and sc.status = '0'
+        limit 1
+    </select>
+
+    <select id="selectEnabledConfigs" resultMap="AiSessionConfigResult">
+        <include refid="selectAiSessionConfigVo"/>
+        where sc.status = '0'
+        order by sc.config_id
+    </select>
+
+    <!-- ========== 提示词关联管理 ========== -->
+
+    <select id="selectPromptIdsByConfigId" parameterType="Long" resultType="Long">
+        select prompt_id from ai_session_prompt where config_id = #{configId}
+    </select>
+
+    <delete id="deletePromptRelationsByConfigId" parameterType="Long">
+        delete from ai_session_prompt where config_id = #{configId}
+    </delete>
+
+    <insert id="insertPromptRelation">
+        insert into ai_session_prompt (config_id, prompt_id) values (#{configId}, #{promptId})
+    </insert>
+
+    <delete id="deletePromptRelationsByPromptId" parameterType="Long">
+        delete from ai_session_prompt where prompt_id = #{promptId}
+    </delete>
+
+    <insert id="insertAiSessionConfig" parameterType="com.xinling.ai.domain.config.AiSessionConfig" useGeneratedKeys="true" keyProperty="configId">
+        insert into ai_session_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="configName != null and configName != ''">config_name,</if>
+            <if test="chatModelId != null">chat_model_id,</if>
+            <if test="embeddingModelId != null">embedding_model_id,</if>
+            <if test="maxHistoryMessages != null">max_history_messages,</if>
+            <if test="enableRag != null and enableRag != ''">enable_rag,</if>
+            <if test="ragMaxResults != null">rag_max_results,</if>
+            <if test="ragMinScore != null">rag_min_score,</if>
+            <if test="isDefault != null and isDefault != ''">is_default,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="configName != null and configName != ''">#{configName},</if>
+            <if test="chatModelId != null">#{chatModelId},</if>
+            <if test="embeddingModelId != null">#{embeddingModelId},</if>
+            <if test="maxHistoryMessages != null">#{maxHistoryMessages},</if>
+            <if test="enableRag != null and enableRag != ''">#{enableRag},</if>
+            <if test="ragMaxResults != null">#{ragMaxResults},</if>
+            <if test="ragMinScore != null">#{ragMinScore},</if>
+            <if test="isDefault != null and isDefault != ''">#{isDefault},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateAiSessionConfig" parameterType="com.xinling.ai.domain.config.AiSessionConfig">
+        update ai_session_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="configName != null and configName != ''">config_name = #{configName},</if>
+            <if test="chatModelId != null">chat_model_id = #{chatModelId},</if>
+            <if test="embeddingModelId != null">embedding_model_id = #{embeddingModelId},</if>
+            <if test="maxHistoryMessages != null">max_history_messages = #{maxHistoryMessages},</if>
+            <if test="enableRag != null and enableRag != ''">enable_rag = #{enableRag},</if>
+            <if test="ragMaxResults != null">rag_max_results = #{ragMaxResults},</if>
+            <if test="ragMinScore != null">rag_min_score = #{ragMinScore},</if>
+            <if test="isDefault != null and isDefault != ''">is_default = #{isDefault},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where config_id = #{configId}
+    </update>
+
+    <delete id="deleteAiSessionConfigById" parameterType="Long">
+        delete from ai_session_config where config_id = #{configId}
+    </delete>
+
+    <delete id="deleteAiSessionConfigByIds" parameterType="Long">
+        delete from ai_session_config where config_id in
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+</mapper>

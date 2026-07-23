@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="fSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a9ba8"/>
+      <stop offset="35%" stop-color="#648890"/>
+      <stop offset="60%" stop-color="#4a6d78"/>
+      <stop offset="100%" stop-color="#2d4a55"/>
+    </linearGradient>
+    <radialGradient id="fSun" cx="50%" cy="8%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,235,200,0.2)"/>
+      <stop offset="60%" stop-color="rgba(255,235,200,0.05)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="fGround" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="60%" stop-color="rgba(15,30,35,0.4)"/>
+      <stop offset="100%" stop-color="rgba(10,20,25,0.6)"/>
+    </linearGradient>
+    <filter id="fBlur"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <rect width="390" height="844" fill="url(#fSky)"/>
+  <rect width="390" height="844" fill="url(#fSun)"/>
+  <ellipse cx="50%" cy="35%" rx="60%" ry="12%" fill="rgba(200,220,210,0.04)" filter="url(#fBlur)"/>
+  <ellipse cx="30%" cy="50%" rx="50%" ry="10%" fill="rgba(190,210,200,0.03)" filter="url(#fBlur)"/>
+  <path d="M0 844 L0 580 Q20 520 40 570 Q60 480 80 540 Q100 460 120 530 Q140 440 160 510 Q180 420 200 490 Q220 430 240 500 Q260 440 280 510 Q300 460 320 530 Q340 470 360 540 Q380 500 390 560 L390 844Z" fill="rgba(15,30,35,0.15)"/>
+  <path d="M0 844 L0 620 Q30 570 60 610 Q90 540 120 590 Q150 520 180 570 Q210 510 240 560 Q270 520 300 570 Q330 530 360 580 Q380 560 390 590 L390 844Z" fill="rgba(10,25,30,0.1)"/>
+  <rect width="390" height="844" fill="url(#fGround)"/>
+</svg>

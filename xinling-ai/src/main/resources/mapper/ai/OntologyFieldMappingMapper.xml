@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyFieldMappingMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyFieldMapping" id="OntologyFieldMappingResult">
+        <result property="fieldMappingId"    column="field_mapping_id"    />
+        <result property="mappingId"    column="mapping_id"    />
+        <result property="propertyCode"    column="property_code"    />
+        <result property="columnName"    column="column_name"    />
+        <result property="defaultValue"    column="default_value"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyFieldMappingVo">
+        select fm.field_mapping_id, fm.mapping_id, fm.property_code,
+               fm.column_name, fm.default_value,
+               fm.create_by, fm.create_time, fm.update_by, fm.update_time
+        from ai_ontology_field_mapping fm
+    </sql>
+
+    <select id="selectOntologyFieldMappingList" parameterType="com.xinling.ai.domain.ontology.OntologyFieldMapping" resultMap="OntologyFieldMappingResult">
+        <include refid="selectOntologyFieldMappingVo"/>
+        <where>
+            <if test="mappingId != null">
+                AND fm.mapping_id = #{mappingId}
+            </if>
+            <if test="propertyCode != null and propertyCode != ''">
+                AND fm.property_code = #{propertyCode}
+            </if>
+            <if test="columnName != null and columnName != ''">
+                AND fm.column_name = #{columnName}
+            </if>
+        </where>
+        order by fm.field_mapping_id
+    </select>
+
+    <select id="selectOntologyFieldMappingById" parameterType="Long" resultMap="OntologyFieldMappingResult">
+        <include refid="selectOntologyFieldMappingVo"/>
+        where fm.field_mapping_id = #{fieldMappingId}
+    </select>
+
+    <select id="selectFieldMappingsByMappingId" parameterType="Long" resultMap="OntologyFieldMappingResult">
+        <include refid="selectOntologyFieldMappingVo"/>
+        where fm.mapping_id = #{mappingId}
+        order by fm.field_mapping_id
+    </select>
+
+    <select id="selectFieldMappingsByPropertyCode" parameterType="String" resultMap="OntologyFieldMappingResult">
+        <include refid="selectOntologyFieldMappingVo"/>
+        where fm.property_code = #{propertyCode}
+        order by fm.field_mapping_id
+    </select>
+
+    <insert id="insertOntologyFieldMapping" parameterType="com.xinling.ai.domain.ontology.OntologyFieldMapping" useGeneratedKeys="true" keyProperty="fieldMappingId">
+        insert into ai_ontology_field_mapping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mappingId != null">mapping_id,</if>
+            <if test="propertyCode != null and propertyCode != ''">property_code,</if>
+            <if test="columnName != null and columnName != ''">column_name,</if>
+            <if test="defaultValue != null">default_value,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mappingId != null">#{mappingId},</if>
+            <if test="propertyCode != null and propertyCode != ''">#{propertyCode},</if>
+            <if test="columnName != null and columnName != ''">#{columnName},</if>
+            <if test="defaultValue != null">#{defaultValue},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyFieldMapping" parameterType="com.xinling.ai.domain.ontology.OntologyFieldMapping">
+        update ai_ontology_field_mapping
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="propertyCode != null and propertyCode != ''">property_code = #{propertyCode},</if>
+            <if test="columnName != null and columnName != ''">column_name = #{columnName},</if>
+            <if test="defaultValue != null">default_value = #{defaultValue},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where field_mapping_id = #{fieldMappingId}
+    </update>
+
+    <delete id="deleteOntologyFieldMappingById" parameterType="Long">
+        delete from ai_ontology_field_mapping where field_mapping_id = #{fieldMappingId}
+    </delete>
+
+    <delete id="deleteOntologyFieldMappingByIds" parameterType="Long">
+        delete from ai_ontology_field_mapping where field_mapping_id in
+        <foreach item="fieldMappingId" collection="array" open="(" separator="," close=")">
+            #{fieldMappingId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteFieldMappingsByMappingId" parameterType="Long">
+        delete from ai_ontology_field_mapping where mapping_id = #{mappingId}
+    </delete>
+
+</mapper>

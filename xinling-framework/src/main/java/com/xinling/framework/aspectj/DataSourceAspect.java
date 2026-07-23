@@ -1,19 +1,33 @@
 package com.xinling.framework.aspectj;
 
 import java.util.Objects;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Around;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.annotation.DataSource;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.framework.datasource.DynamicDataSourceContextHolder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * 多数据源处理
@@ -21,8 +35,10 @@ import com.xinling.framework.datasource.DynamicDataSourceContextHolder;
  * @author xinling
  */
 @Aspect
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 @Order(1)
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class DataSourceAspect
 {
     protected Logger logger = LoggerFactory.getLogger(getClass());

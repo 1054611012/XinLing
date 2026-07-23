@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.DistributorMapper">
+
+    <resultMap id="DistributorResult" type="com.xinling.app.domain.entity.Distributor">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="level" property="level" />
+        <result column="real_name" property="realName" />
+        <result column="phone" property="phone" />
+        <result column="alipay_account" property="alipayAccount" />
+        <result column="wechat_account" property="wechatAccount" />
+        <result column="total_commission" property="totalCommission" />
+        <result column="available_commission" property="availableCommission" />
+        <result column="frozen_commission" property="frozenCommission" />
+        <result column="total_withdraw" property="totalWithdraw" />
+        <result column="total_fans" property="totalFans" />
+        <result column="total_orders" property="totalOrders" />
+        <result column="status" property="status" />
+        <result column="apply_time" property="applyTime" />
+        <result column="audit_time" property="auditTime" />
+        <result column="audit_remark" property="auditRemark" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, level, real_name, phone, alipay_account, wechat_account,
+        total_commission, available_commission, frozen_commission, total_withdraw,
+        total_fans, total_orders, status, apply_time, audit_time, audit_remark,
+        create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="DistributorResult">
+        SELECT <include refid="selectColumns" />
+        FROM distributor
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="DistributorResult">
+        SELECT <include refid="selectColumns" />
+        FROM distributor
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectList" resultMap="DistributorResult">
+        SELECT <include refid="selectColumns" />
+        FROM distributor
+        <where>
+            <if test="level != null">
+                AND level = #{level}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO distributor (
+            user_id, level, real_name, phone, alipay_account, wechat_account,
+            total_commission, available_commission, frozen_commission, total_withdraw,
+            total_fans, total_orders, status, apply_time
+        ) VALUES (
+            #{userId}, #{level}, #{realName}, #{phone}, #{alipayAccount}, #{wechatAccount},
+            #{totalCommission}, #{availableCommission}, #{frozenCommission}, #{totalWithdraw},
+            #{totalFans}, #{totalOrders}, #{status}, NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE distributor
+        <set>
+            <if test="level != null">level = #{level},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="alipayAccount != null">alipay_account = #{alipayAccount},</if>
+            <if test="wechatAccount != null">wechat_account = #{wechatAccount},</if>
+            <if test="totalCommission != null">total_commission = #{totalCommission},</if>
+            <if test="availableCommission != null">available_commission = #{availableCommission},</if>
+            <if test="frozenCommission != null">frozen_commission = #{frozenCommission},</if>
+            <if test="totalWithdraw != null">total_withdraw = #{totalWithdraw},</if>
+            <if test="totalFans != null">total_fans = #{totalFans},</if>
+            <if test="totalOrders != null">total_orders = #{totalOrders},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="auditTime != null">audit_time = #{auditTime},</if>
+            <if test="auditRemark != null">audit_remark = #{auditRemark},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateCommission">
+        UPDATE distributor
+        SET total_commission = #{totalCommission},
+            available_commission = #{availableCommission},
+            frozen_commission = #{frozenCommission}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateWithdrawInfo">
+        UPDATE distributor
+        SET available_commission = #{availableCommission},
+            frozen_commission = #{frozenCommission},
+            total_withdraw = #{totalWithdraw}
+        WHERE id = #{id}
+    </update>
+</mapper>

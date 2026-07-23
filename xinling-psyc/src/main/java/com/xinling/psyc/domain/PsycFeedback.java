@@ -24,6 +24,10 @@ public class PsycFeedback extends BaseEntity
     @Excel(name = "提交反馈的用户ID")
     private Long userId;
 
+    // 不存数据库
+    @Excel(name = "用户名称")
+    private transient String userName;
+
     /** 反馈类型：1-Bug问题 2-产品建议 3-投诉 4-功能需求 5-其他 */
     @Excel(name = "反馈类型：1-Bug问题 2-产品建议 3-投诉 4-功能需求 5-其他")
     private Long type;
@@ -41,7 +45,7 @@ public class PsycFeedback extends BaseEntity
     private String contact;
 
     /** 自动收集的设备信息（系统、型号、APP版本等） */
-    @Excel(name = "自动收集的设备信息", readConverterExp = "系=统、型号、APP版本等")
+    @Excel(name = "自动收集的设备信息", readConverterExp = "系统、型号、APP版本等")
     private String deviceInfo;
 
     /** 处理状态：0-待处理 1-处理中 2-已处理 3-已关闭 */
@@ -69,6 +73,14 @@ public class PsycFeedback extends BaseEntity
     public Long getUserId()
     {
         return userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public void setType(Long type)

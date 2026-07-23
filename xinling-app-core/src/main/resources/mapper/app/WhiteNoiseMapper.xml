@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.WhiteNoiseMapper">
+
+    <resultMap id="WhiteNoiseResult" type="com.xinling.app.domain.entity.WhiteNoise">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="description" property="description" />
+        <result column="cover_url" property="coverUrl" />
+        <result column="audio_item_id" property="audioItemId" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <association property="audioItem" column="audio_item_id"
+                     select="com.xinling.app.mapper.AudioItemMapper.selectById" />
+        <collection property="backgroundImages" ofType="com.xinling.app.domain.entity.ContentBg"
+                    column="id" select="com.xinling.app.mapper.ContentBgMapper.selectWhiteNoiseBg" />
+    </resultMap>
+
+    <sql id="selectVo">
+        SELECT id, title, description, cover_url, audio_item_id, status, sort_order, create_time, update_time
+        FROM white_noise
+    </sql>
+
+    <select id="selectById" resultMap="WhiteNoiseResult">
+        <include refid="selectVo" /> WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="WhiteNoiseResult">
+        <include refid="selectVo" />
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO white_noise (title, description, cover_url, audio_item_id, status, sort_order)
+        VALUES (#{title}, #{description}, #{coverUrl}, #{audioItemId}, #{status}, #{sortOrder})
+    </insert>
+
+    <update id="updateById">
+        UPDATE white_noise
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="coverUrl != null">cover_url = #{coverUrl},</if>
+            <if test="audioItemId != null">audio_item_id = #{audioItemId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM white_noise WHERE id = #{id}
+    </delete>
+
+</mapper>

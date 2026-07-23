@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.entity.SysUser;
 import com.xinling.common.core.domain.model.LoginUser;
 import com.xinling.common.enums.UserStatus;
@@ -21,6 +22,7 @@ import com.xinling.system.service.ISysUserService;
  * @author xinling
  */
 @Service
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class UserDetailsServiceImpl implements UserDetailsService
 {
     private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);

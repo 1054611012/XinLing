@@ -32,13 +32,22 @@ public class DocumentLoaderService {
     private EmbeddingModel embeddingModel;
 
     @Autowired
+    private EmbeddingStore<TextSegment> embeddingStore;
+
+    @Autowired
     private AiConfigProperties aiConfigProperties;
 
     /**
      * 加载知识库文档到向量存储
      */
-    public void loadKnowledgeBaseDocuments(EmbeddingStore<TextSegment> embeddingStore) {
+    public void loadKnowledgeBaseDocuments() {
         try {
+            // 检查 EmbeddingModel 是否可用
+            if (!isEmbeddingModelAvailable()) {
+                log.warn("EmbeddingModel 服务不可用，跳过知识库文档加载。请确保 Ollama 服务正在运行。");
+                return;
+            }
+
             String knowledgeBasePath = aiConfigProperties.getRag().getKnowledgeBasePath();
             Path path = Paths.get(knowledgeBasePath);
 
@@ -83,11 +92,26 @@ public class DocumentLoaderService {
                 }
 
                 log.info("文档 {} 分割为 {} 个片段并存入向量存储",
-                    document.metadata("source"), segments.size());
+                    document.metadata().getString("source"), segments.size());
             }
 
         } catch (Exception e) {
-            log.error("加载知识库文档失败", e);
+            log.error("加载知识库文档失败，但不影响应用启动。您可以稍后手动加载或重启 Ollama 服务后重试", e);
+        }
+    }
+
+    /**
+     * 检查 EmbeddingModel 是否可用
+     * @return 是否可用
+     */
+    private boolean isEmbeddingModelAvailable() {
+        try {
+            // 尝试进行一次简单的 embedding 操作来测试连接
+            embeddingModel.embed("test");
+            return true;
+        } catch (Exception e) {
+            log.warn("EmbeddingModel 连接测试失败: {}", e.getMessage());
+            return false;
         }
     }
 

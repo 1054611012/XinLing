@@ -16,5 +16,11 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <!-- 使用驼峰命名法转换字段 -->
 		<!-- <setting name="mapUnderscoreToCamelCase" value="true"/> -->
 	</settings>
-	
+
+    <!-- 类型处理器 -->
+    <typeHandlers>
+        <typeHandler handler="com.xinling.framework.typehandler.JacksonListTypeHandler"
+                     javaType="java.util.List"
+                     jdbcType="VARCHAR"/>
+    </typeHandlers>
 </configuration>

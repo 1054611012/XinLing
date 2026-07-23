@@ -1,5 +1,13 @@
 # 数据库结构与SQL查询结果分析
 
+> **字段命名规范速查**：
+> - `sys_*` 表：时间用 `create_time`/`update_time`，操作人用 `create_by`/`update_by`，删除标记用 `del_flag`(char)，状态用 `status`(char需加引号)
+> - `psyc_test`/`psyc_feedback`：时间用 `create_time`/`update_time`（同sys_*），主键用 `id`
+> - `psyc_questions`/`psyc_options`/`psyc_post`/`psyc_question_answers`：时间用 `created_at`/`updated_at` ⚠️，操作人用 `created_by` ⚠️
+> - `psyc_assessment_rule`：无时间字段，删除标记用 `is_deleted`(tinyint) ⚠️
+> - `psyc_post_media`：无时间字段
+> - **状态值**：`psyc_test.status`(tinyint) 1=启用/0=停用；`psyc_post.status`(tinyint) 1=正常/0=删除/2=审核中；`sys_user.status`(char) '0'=正常/'1'=停用
+
 ## 1. 数据库结构概览
 
 根据提供的SQL文件（su_crm.sql）和系统数据库分析文档，我们整理出完整的数据库结构，包括系统管理模块和心理测评模块。

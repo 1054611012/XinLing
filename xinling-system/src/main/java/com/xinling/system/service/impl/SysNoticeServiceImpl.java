@@ -63,6 +63,7 @@ public class SysNoticeServiceImpl implements ISysNoticeService {
         int result = noticeMapper.insertNotice(notice);
         if (result > 0) {
             refreshNoticeCache(); // 操作成功后刷新缓存
+
         }
         return result;
     }

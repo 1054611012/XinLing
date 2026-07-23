@@ -2,6 +2,7 @@ package com.xinling.framework.web.service;
 
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.util.CollectionUtils;
 import com.xinling.common.constant.Constants;
 import com.xinling.common.core.domain.entity.SysRole;
@@ -16,6 +17,7 @@ import com.xinling.framework.security.context.PermissionContextHolder;
  * @author xinling
  */
 @Service("ss")
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class PermissionService
 {
     /**

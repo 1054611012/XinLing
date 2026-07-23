@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.AutoRenewMapper">
+
+    <resultMap id="AutoRenewResult" type="com.xinling.app.domain.entity.AutoRenew">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="package_id" property="packageId" />
+        <result column="pay_type" property="payType" />
+        <result column="agreement_id" property="agreementId" />
+        <result column="next_pay_time" property="nextPayTime" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, package_id, pay_type, agreement_id,
+        next_pay_time, status, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AutoRenewResult">
+        SELECT <include refid="selectColumns" />
+        FROM auto_renew
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="AutoRenewResult">
+        SELECT <include refid="selectColumns" />
+        FROM auto_renew
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserIdAndPackageId" resultMap="AutoRenewResult">
+        SELECT <include refid="selectColumns" />
+        FROM auto_renew
+        WHERE user_id = #{userId} AND package_id = #{packageId}
+    </select>
+
+    <select id="selectActiveList" resultMap="AutoRenewResult">
+        SELECT <include refid="selectColumns" />
+        FROM auto_renew
+        WHERE status = 1
+        ORDER BY next_pay_time ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO auto_renew (
+            user_id, package_id, pay_type, agreement_id,
+            next_pay_time, status
+        ) VALUES (
+            #{userId}, #{packageId}, #{payType}, #{agreementId},
+            #{nextPayTime}, #{status}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE auto_renew
+        <set>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="agreementId != null">agreement_id = #{agreementId},</if>
+            <if test="nextPayTime != null">next_pay_time = #{nextPayTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE auto_renew
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM auto_renew WHERE id = #{id}
+    </delete>
+
+</mapper>

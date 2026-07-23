@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.ActivityMapper">
+
+    <resultMap id="ActivityResult" type="com.xinling.app.domain.entity.Activity">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="description" property="description" />
+        <result column="cover" property="cover" />
+        <result column="type" property="type" />
+        <result column="rule" property="rule" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="priority" property="priority" />
+        <result column="status" property="status" />
+        <result column="join_count" property="joinCount" />
+        <result column="order_count" property="orderCount" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, title, description, cover, type, rule, start_time, end_time,
+        priority, status, join_count, order_count, total_amount,
+        create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="ActivityResult">
+        SELECT <include refid="selectColumns" />
+        FROM activity
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="ActivityResult">
+        SELECT <include refid="selectColumns" />
+        FROM activity
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectActiveList" resultMap="ActivityResult">
+        SELECT <include refid="selectColumns" />
+        FROM activity
+        WHERE status = 1
+          AND start_time &lt;= NOW()
+          AND end_time &gt;= NOW()
+        ORDER BY priority DESC, create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO activity (
+            title, description, cover, type, rule, start_time, end_time,
+            priority, status
+        ) VALUES (
+            #{title}, #{description}, #{cover}, #{type}, #{rule}, #{startTime}, #{endTime},
+            #{priority}, #{status}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE activity
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="rule != null">rule = #{rule},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="joinCount != null">join_count = #{joinCount},</if>
+            <if test="orderCount != null">order_count = #{orderCount},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementJoinCount">
+        UPDATE activity
+        SET join_count = join_count + 1
+        WHERE id = #{id}
+    </update>
+</mapper>

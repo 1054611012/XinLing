@@ -6,10 +6,10 @@ import com.xinling.ai.config.AiConfigProperties;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.StreamingResponseHandler;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,20 +37,18 @@ public class OllamaService {
     private AiConfigProperties aiConfig;
 
     @Autowired
-    private ChatLanguageModel chatLanguageModel;
+    private ChatModel chatLanguageModel;
 
     @Autowired
-    private StreamingChatLanguageModel streamingChatLanguageModel;
+    private StreamingChatModel streamingChatModel;
 
     /**
      * 获取Ollama模型列表
      */
     public Flux<String> listModels() {
         try {
-            // 创建HTTP客户端
             HttpClient client = HttpClient.newHttpClient();
 
-            // 构建请求URL
             String baseUrl = aiConfig.getOllama().getBaseUrl();
             String url = baseUrl.endsWith("/") ? baseUrl + "api/tags" : baseUrl + "/api/tags";
 
@@ -60,7 +58,6 @@ public class OllamaService {
                 .GET()
                 .build();
 
-            // 发送请求并获取响应
             HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
@@ -71,7 +68,6 @@ public class OllamaService {
                 JsonNode modelsNode = rootNode.get("models");
 
                 if (modelsNode != null && modelsNode.isArray()) {
-                    // 将JsonNode数组转换为Stream并映射为模型名称
                     List<String> modelNames = StreamSupport.stream(modelsNode.spliterator(), false)
                         .map(model -> model.get("name").asText())
                         .filter(name -> name != null && !name.isEmpty())
@@ -84,8 +80,7 @@ public class OllamaService {
             log.error("获取Ollama模型列表失败", e);
         }
 
-        // 如果API调用失败，返回配置的模型名称
-        return Flux.just(aiConfig.getOllama().getModel());
+        return Flux.just(aiConfig.getOllama().getChatModel());
     }
 
     /**
@@ -93,9 +88,7 @@ public class OllamaService {
      */
     public String chat(String userMessage) {
         try {
-            UserMessage userMsg = new UserMessage(userMessage);
-            Response<AiMessage> response = chatLanguageModel.generate(userMsg);
-            return response.content().text();
+            return chatLanguageModel.chat(userMessage);
         } catch (Exception e) {
             log.error("Ollama聊天错误", e);
             throw new RuntimeException("Ollama聊天服务错误: " + e.getMessage());
@@ -109,16 +102,14 @@ public class OllamaService {
         Sinks.Many<String> sink = Sinks.many().multicast().onBackpressureBuffer();
 
         try {
-            UserMessage userMsg = new UserMessage(userMessage);
-
-            streamingChatLanguageModel.generate(userMsg, new StreamingResponseHandler<AiMessage>() {
+            streamingChatModel.chat(userMessage, new StreamingChatResponseHandler() {
                 @Override
-                public void onNext(String token) {
+                public void onPartialResponse(String token) {
                     sink.tryEmitNext(token);
                 }
 
                 @Override
-                public void onComplete(Response<AiMessage> response) {
+                public void onCompleteResponse(ChatResponse response) {
                     sink.tryEmitComplete();
                 }
 
@@ -143,14 +134,14 @@ public class OllamaService {
         Sinks.Many<String> sink = Sinks.many().multicast().onBackpressureBuffer();
 
         try {
-            streamingChatLanguageModel.generate(messages, new StreamingResponseHandler<AiMessage>() {
+            streamingChatModel.chat(messages, new StreamingChatResponseHandler() {
                 @Override
-                public void onNext(String token) {
+                public void onPartialResponse(String token) {
                     sink.tryEmitNext(token);
                 }
 
                 @Override
-                public void onComplete(Response<AiMessage> response) {
+                public void onCompleteResponse(ChatResponse response) {
                     sink.tryEmitComplete();
                 }
 

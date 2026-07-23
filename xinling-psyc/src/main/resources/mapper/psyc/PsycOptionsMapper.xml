@@ -36,10 +36,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectPsycOptionsListByQuestionIds" resultMap="PsycOptionsResult">
-        select * from psyc_options where question_id in
-        <foreach item="id" collection="list" separator="," open="(" close=")">
-            #{id}
-        </foreach>
+        select id, question_id, content, score, sort_order, created_at, updated_at from psyc_options
+        <where>
+            <if test="list != null and list.size() > 0">
+                question_id in
+                <foreach item="id" collection="list" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <insert id="insertPsycOptions" parameterType="PsycOptions" useGeneratedKeys="true" keyProperty="id">

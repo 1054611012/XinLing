@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.util.CollectionUtils;
 import com.xinling.common.constant.Constants;
 import com.xinling.common.constant.UserConstants;
@@ -20,6 +21,7 @@ import com.xinling.system.service.ISysRoleService;
  * @author xinling
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SysPermissionService
 {
     @Autowired

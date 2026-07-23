@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * 聊天响应对象
- * 
+ *
  * @author SuXia
  * @date 2025/12/29
  */
@@ -36,11 +36,28 @@ public class ChatResponse {
      */
     private String error;
 
+    /**
+     * 语音合成音频URL（可选）
+     */
+    private String audioUrl;
+
+    /**
+     * 当前状态（前端表情驱动）
+     */
+    private String mood;
+
     public static ChatResponse of(String content, String sessionId) {
         ChatResponse response = new ChatResponse();
         response.setContent(content);
         response.setSessionId(sessionId);
         response.setTimestamp(System.currentTimeMillis());
+        return response;
+    }
+
+    public static ChatResponse of(String content, String sessionId, String audioUrl, String mood) {
+        ChatResponse response = of(content, sessionId);
+        response.setAudioUrl(audioUrl);
+        response.setMood(mood);
         return response;
     }
 

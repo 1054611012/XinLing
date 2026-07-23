@@ -1,20 +1,35 @@
 package com.xinling.framework.interceptor.impl;
 
 import java.util.HashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.concurrent.TimeUnit;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.alibaba.fastjson2.JSON;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.annotation.RepeatSubmit;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.constant.CacheConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.redis.RedisCache;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.filter.RepeatedlyRequestWrapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.http.HttpHelper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.framework.interceptor.RepeatSubmitInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * 判断请求url和数据是否和上一次相同，
@@ -23,6 +38,7 @@ import com.xinling.framework.interceptor.RepeatSubmitInterceptor;
  * @author xinling
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SameUrlDataInterceptor extends RepeatSubmitInterceptor
 {
     public final String REPEAT_PARAMS = "repeatParams";

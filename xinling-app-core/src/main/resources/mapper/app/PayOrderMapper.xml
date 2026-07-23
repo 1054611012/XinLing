@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.PayOrderMapper">
+
+    <resultMap id="PayOrderResult" type="com.xinling.app.domain.entity.PayOrder">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="user_id" property="userId" />
+        <result column="package_id" property="packageId" />
+        <result column="package_name" property="packageName" />
+        <result column="amount" property="amount" />
+        <result column="pay_amount" property="payAmount" />
+        <result column="discount_amount" property="discountAmount" />
+        <result column="coupon_id" property="couponId" />
+        <result column="pay_type" property="payType" />
+        <result column="order_status" property="orderStatus" />
+        <result column="pay_time" property="payTime" />
+        <result column="expire_time" property="expireTime" />
+        <result column="transaction_id" property="transactionId" />
+        <result column="refund_amount" property="refundAmount" />
+        <result column="refund_time" property="refundTime" />
+        <result column="refund_reason" property="refundReason" />
+        <result column="distributor_id" property="distributorId" />
+        <result column="commission_amount" property="commissionAmount" />
+        <result column="activity_id" property="activityId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, order_no, user_id, package_id, package_name, amount,
+        pay_amount, discount_amount, coupon_id, pay_type, order_status,
+        pay_time, expire_time, transaction_id, refund_amount, refund_time,
+        refund_reason, distributor_id, commission_amount, activity_id,
+        create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectByOrderNo" resultMap="PayOrderResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_order
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </select>
+
+    <select id="selectByUserId" resultMap="PayOrderResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_order
+        WHERE user_id = #{userId} AND is_deleted = 0
+        <if test="status != null">
+            AND order_status = #{status}
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="selectList" resultMap="PayOrderResult">
+        SELECT <include refid="selectColumns" />
+        FROM pay_order
+        <where>
+            is_deleted = 0
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="orderStatus != null">
+                AND order_status = #{orderStatus}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM pay_order
+        WHERE user_id = #{userId} AND is_deleted = 0
+        <if test="status != null">
+            AND order_status = #{status}
+        </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO pay_order (
+            order_no, user_id, package_id, package_name, amount,
+            pay_amount, discount_amount, coupon_id, order_status,
+            expire_time, create_time
+        ) VALUES (
+            #{orderNo}, #{userId}, #{packageId}, #{packageName}, #{amount},
+            #{payAmount}, #{discountAmount}, #{couponId}, #{orderStatus},
+            #{expireTime}, NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE pay_order
+        <set>
+            <if test="payAmount != null">pay_amount = #{payAmount},</if>
+            <if test="discountAmount != null">discount_amount = #{discountAmount},</if>
+            <if test="couponId != null">coupon_id = #{couponId},</if>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="transactionId != null">transaction_id = #{transactionId},</if>
+            <if test="refundAmount != null">refund_amount = #{refundAmount},</if>
+            <if test="refundTime != null">refund_time = #{refundTime},</if>
+            <if test="refundReason != null">refund_reason = #{refundReason},</if>
+        </set>
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </update>
+
+    <update id="updateStatus">
+        UPDATE pay_order
+        SET order_status = #{orderStatus}
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </update>
+
+    <update id="updatePayInfo">
+        UPDATE pay_order
+        SET order_status = #{orderStatus},
+            pay_type = #{payType},
+            pay_amount = #{payAmount},
+            pay_time = #{payTime},
+            transaction_id = #{transactionId},
+            coupon_id = #{couponId}
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </update>
+
+</mapper>

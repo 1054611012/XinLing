@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyMappingMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyMapping" id="OntologyMappingResult">
+        <result property="mappingId" column="mapping_id"/>
+        <result property="conceptCode" column="concept_code"/>
+        <result property="conceptId" column="concept_id"/>
+        <result property="conceptName" column="concept_name"/>
+        <result property="tableName" column="table_name"/>
+        <result property="recordId" column="record_id"/>
+        <result property="mappingType" column="mapping_type"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectOntologyMappingVo">
+        select m.mapping_id, m.concept_code, m.concept_id, c.concept_name as concept_name,
+               m.table_name, m.record_id, m.mapping_type,
+               m.create_by, m.create_time, m.update_by, m.update_time
+        from ai_ontology_mapping m
+        left join ai_ontology_concept c on m.concept_id = c.concept_id
+    </sql>
+
+    <select id="selectOntologyMappingById" parameterType="Long" resultMap="OntologyMappingResult">
+        <include refid="selectOntologyMappingVo"/>
+        where m.mapping_id = #{mappingId}
+    </select>
+
+    <select id="selectOntologyMappingList" parameterType="com.xinling.ai.domain.ontology.OntologyMapping" resultMap="OntologyMappingResult">
+        <include refid="selectOntologyMappingVo"/>
+        <where>
+            <if test="conceptCode != null and conceptCode != ''">and m.concept_code = #{conceptCode}</if>
+            <if test="conceptId != null">and m.concept_id = #{conceptId}</if>
+            <if test="tableName != null and tableName != ''">and m.table_name = #{tableName}</if>
+            <if test="recordId != null">and m.record_id = #{recordId}</if>
+            <if test="mappingType != null and mappingType != ''">and m.mapping_type = #{mappingType}</if>
+        </where>
+        order by m.create_time desc
+    </select>
+
+    <select id="selectMappingsByConceptCode" parameterType="String" resultMap="OntologyMappingResult">
+        <include refid="selectOntologyMappingVo"/>
+        where m.concept_code = #{conceptCode}
+        order by m.create_time desc
+    </select>
+
+    <select id="selectMappingsByConceptId" parameterType="Long" resultMap="OntologyMappingResult">
+        <include refid="selectOntologyMappingVo"/>
+        where m.concept_id = #{conceptId}
+        order by m.create_time desc
+    </select>
+
+    <select id="selectMappingsByTableRecord" resultMap="OntologyMappingResult">
+        <include refid="selectOntologyMappingVo"/>
+        where m.table_name = #{tableName} and m.record_id = #{recordId}
+        order by m.create_time desc
+    </select>
+
+    <insert id="insertOntologyMapping" parameterType="com.xinling.ai.domain.ontology.OntologyMapping" useGeneratedKeys="true" keyProperty="mappingId">
+        insert into ai_ontology_mapping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="conceptCode != null and conceptCode != ''">concept_code,</if>
+            <if test="conceptId != null">concept_id,</if>
+            <if test="tableName != null and tableName != ''">table_name,</if>
+            <if test="recordId != null">record_id,</if>
+            <if test="mappingType != null and mappingType != ''">mapping_type,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="conceptCode != null and conceptCode != ''">#{conceptCode},</if>
+            <if test="conceptId != null">#{conceptId},</if>
+            <if test="tableName != null and tableName != ''">#{tableName},</if>
+            <if test="recordId != null">#{recordId},</if>
+            <if test="mappingType != null and mappingType != ''">#{mappingType},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <delete id="deleteOntologyMappingById" parameterType="Long">
+        delete from ai_ontology_mapping where mapping_id = #{mappingId}
+    </delete>
+
+    <delete id="deleteMappingsByConceptCode" parameterType="String">
+        delete from ai_ontology_mapping where concept_code = #{conceptCode}
+    </delete>
+
+    <delete id="deleteMappingsByConceptId" parameterType="Long">
+        delete from ai_ontology_mapping where concept_id = #{conceptId}
+    </delete>
+
+    <delete id="deleteMappingsByTableRecord">
+        delete from ai_ontology_mapping where table_name = #{tableName} and record_id = #{recordId}
+    </delete>
+
+</mapper>

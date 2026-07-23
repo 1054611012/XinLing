@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.AudioMixMapper">
+
+    <resultMap id="AudioMixResult" type="com.xinling.app.domain.entity.AudioMix">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="cover_url" property="coverUrl" />
+        <result column="audio_ids" property="audioIds" />
+        <result column="is_default" property="isDefault" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectAudioMixVo">
+        SELECT id, name, description, cover_url, audio_ids,
+               is_default, sort_order, status, create_time, update_time
+        FROM audio_mix
+    </sql>
+
+    <select id="selectById" resultMap="AudioMixResult">
+        <include refid="selectAudioMixVo" />
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectList" resultMap="AudioMixResult">
+        <include refid="selectAudioMixVo" />
+        WHERE status = 1 AND is_deleted = 0
+        ORDER BY is_default DESC, sort_order ASC, id DESC
+    </select>
+
+    <select id="selectAdminList" resultMap="AudioMixResult">
+        <include refid="selectAudioMixVo" />
+        <where>
+            is_deleted = 0
+            <if test="keyword != null and keyword != ''">
+                AND name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY is_default DESC, sort_order ASC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO audio_mix (name, description, cover_url, audio_ids, is_default, sort_order, status)
+        VALUES (#{name}, #{description}, #{coverUrl}, #{audioIds}, #{isDefault}, #{sortOrder}, #{status})
+    </insert>
+
+    <update id="updateById">
+        UPDATE audio_mix
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="coverUrl != null">cover_url = #{coverUrl},</if>
+            <if test="audioIds != null">audio_ids = #{audioIds},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE audio_mix SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

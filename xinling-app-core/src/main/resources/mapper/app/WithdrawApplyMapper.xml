@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.WithdrawApplyMapper">
+
+    <resultMap id="WithdrawApplyResult" type="com.xinling.app.domain.entity.WithdrawApply">
+        <id column="id" property="id" />
+        <result column="distributor_id" property="distributorId" />
+        <result column="amount" property="amount" />
+        <result column="fee" property="fee" />
+        <result column="actual_amount" property="actualAmount" />
+        <result column="pay_type" property="payType" />
+        <result column="account" property="account" />
+        <result column="real_name" property="realName" />
+        <result column="status" property="status" />
+        <result column="audit_user_id" property="auditUserId" />
+        <result column="audit_time" property="auditTime" />
+        <result column="audit_remark" property="auditRemark" />
+        <result column="pay_time" property="payTime" />
+        <result column="transaction_id" property="transactionId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, distributor_id, amount, fee, actual_amount, pay_type, account, real_name,
+        status, audit_user_id, audit_time, audit_remark, pay_time, transaction_id,
+        create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="WithdrawApplyResult">
+        SELECT <include refid="selectColumns" />
+        FROM withdraw_apply
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByDistributorId" resultMap="WithdrawApplyResult">
+        SELECT <include refid="selectColumns" />
+        FROM withdraw_apply
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO withdraw_apply (
+            distributor_id, amount, fee, actual_amount, pay_type, account, real_name, status
+        ) VALUES (
+            #{distributorId}, #{amount}, #{fee}, #{actualAmount}, #{payType}, #{account}, #{realName}, #{status}
+        )
+    </insert>
+    <select id="selectList" resultMap="WithdrawApplyResult">
+        SELECT <include refid="selectColumns" />
+        FROM withdraw_apply
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

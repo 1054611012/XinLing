@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.StatisticsMapper">
+
+    <!-- 专注统计 -->
+    <select id="selectFocusStats" resultType="java.util.HashMap">
+        SELECT
+            DATE_FORMAT(create_time, #{dateFormat}) AS period,
+            COUNT(*) AS total_sessions,
+            SUM(duration) AS total_duration,
+            AVG(duration) AS avg_duration,
+            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS completed_count
+        FROM focus_record
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+          AND create_time >= #{startTime}
+          AND create_time &lt;= #{endTime}
+        GROUP BY period
+        ORDER BY period ASC
+    </select>
+
+    <!-- 睡眠统计 -->
+    <select id="selectSleepStats" resultType="java.util.HashMap">
+        SELECT
+            DATE_FORMAT(create_time, #{dateFormat}) AS period,
+            COUNT(*) AS total_days,
+            AVG(duration) AS avg_duration,
+            AVG(sleep_score) AS avg_score,
+            AVG(deep_sleep_minutes) AS avg_deep_sleep,
+            AVG(light_sleep_minutes) AS avg_light_sleep,
+            AVG(rem_sleep_minutes) AS avg_rem_sleep
+        FROM sleep_record
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+          AND create_time >= #{startTime}
+          AND create_time &lt;= #{endTime}
+        GROUP BY period
+        ORDER BY period ASC
+    </select>
+
+    <!-- 情绪统计 -->
+    <select id="selectEmotionStats" resultType="java.util.HashMap">
+        SELECT
+            emotion,
+            COUNT(*) AS count
+        FROM sleep_diary
+        WHERE user_id = #{userId}
+          AND date >= #{startTime}
+          AND date &lt;= #{endTime}
+          AND emotion IS NOT NULL
+        GROUP BY emotion
+        ORDER BY count DESC
+    </select>
+
+    <!-- AI交互统计 -->
+    <select id="selectAiStats" resultType="java.util.HashMap">
+        SELECT
+            DATE_FORMAT(create_time, #{dateFormat}) AS period,
+            COUNT(*) AS total_count
+        FROM chat_history
+        WHERE user_id = #{userId}
+          AND create_time >= #{startTime}
+          AND create_time &lt;= #{endTime}
+        GROUP BY period
+        ORDER BY period ASC
+    </select>
+
+    <!-- 专注模式分布 -->
+    <select id="selectFocusDistribution" resultType="java.util.HashMap">
+        SELECT
+            mode,
+            COUNT(*) AS count,
+            SUM(duration) AS total_duration
+        FROM focus_record
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+          AND create_time >= #{startTime}
+          AND create_time &lt;= #{endTime}
+          AND mode IS NOT NULL
+        GROUP BY mode
+    </select>
+
+    <!-- 睡眠评分分布 -->
+    <select id="selectSleepDistribution" resultType="java.util.HashMap">
+        SELECT
+            CASE
+                WHEN sleep_score >= 90 THEN 'excellent'
+                WHEN sleep_score >= 75 THEN 'good'
+                WHEN sleep_score >= 60 THEN 'fair'
+                ELSE 'poor'
+            END AS level,
+            COUNT(*) AS count
+        FROM sleep_record
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+          AND create_time >= #{startTime}
+          AND create_time &lt;= #{endTime}
+          AND sleep_score IS NOT NULL
+        GROUP BY level
+    </select>
+
+</mapper>

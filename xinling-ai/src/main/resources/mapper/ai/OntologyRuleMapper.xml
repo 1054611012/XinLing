@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyRuleMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyRule" id="OntologyRuleResult">
+        <result property="ruleId"    column="rule_id"    />
+        <result property="ruleName"    column="rule_name"    />
+        <result property="ruleCode"    column="rule_code"    />
+        <result property="conceptId"    column="concept_id"    />
+        <result property="conceptName"    column="concept_name"    />
+        <result property="condition"    column="condition"    />
+        <result property="action"    column="action"    />
+        <result property="priority"    column="priority"    />
+        <result property="enabled"    column="enabled"    />
+        <result property="description"    column="description"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyRuleVo">
+        select r.rule_id, r.rule_name, r.rule_code,
+               r.concept_id, c.concept_name as concept_name,
+               r.`condition`, r.`action`, r.priority, r.enabled, r.description,
+               r.create_by, r.create_time, r.update_by, r.update_time
+        from ai_ontology_rule r
+        left join ai_ontology_concept c on r.concept_id = c.concept_id
+    </sql>
+
+    <select id="selectOntologyRuleList" parameterType="com.xinling.ai.domain.ontology.OntologyRule" resultMap="OntologyRuleResult">
+        <include refid="selectOntologyRuleVo"/>
+        <where>
+            <if test="ruleName != null and ruleName != ''">
+                AND r.rule_name like concat('%', #{ruleName}, '%')
+            </if>
+            <if test="ruleCode != null and ruleCode != ''">
+                AND r.rule_code = #{ruleCode}
+            </if>
+            <if test="conceptId != null">
+                AND r.concept_id = #{conceptId}
+            </if>
+            <if test="enabled != null and enabled != ''">
+                AND r.enabled = #{enabled}
+            </if>
+        </where>
+        order by r.priority, r.rule_id
+    </select>
+
+    <select id="selectOntologyRuleById" parameterType="Long" resultMap="OntologyRuleResult">
+        <include refid="selectOntologyRuleVo"/>
+        where r.rule_id = #{ruleId}
+    </select>
+
+    <select id="selectRulesByConceptId" parameterType="Long" resultMap="OntologyRuleResult">
+        <include refid="selectOntologyRuleVo"/>
+        where r.concept_id = #{conceptId}
+        order by r.priority
+    </select>
+
+    <select id="selectAllEnabledRules" resultMap="OntologyRuleResult">
+        <include refid="selectOntologyRuleVo"/>
+        where r.enabled = '1'
+        order by r.priority
+    </select>
+
+    <insert id="insertOntologyRule" parameterType="com.xinling.ai.domain.ontology.OntologyRule" useGeneratedKeys="true" keyProperty="ruleId">
+        insert into ai_ontology_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ruleName != null and ruleName != ''">rule_name,</if>
+            <if test="ruleCode != null and ruleCode != ''">rule_code,</if>
+            <if test="conceptId != null">concept_id,</if>
+            <if test="condition != null">`condition`,</if>
+            <if test="action != null">`action`,</if>
+            <if test="priority != null">priority,</if>
+            <if test="enabled != null and enabled != ''">enabled,</if>
+            <if test="description != null">description,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ruleName != null and ruleName != ''">#{ruleName},</if>
+            <if test="ruleCode != null and ruleCode != ''">#{ruleCode},</if>
+            <if test="conceptId != null">#{conceptId},</if>
+            <if test="condition != null">#{condition},</if>
+            <if test="action != null">#{action},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="enabled != null and enabled != ''">#{enabled},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyRule" parameterType="com.xinling.ai.domain.ontology.OntologyRule">
+        update ai_ontology_rule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ruleName != null and ruleName != ''">rule_name = #{ruleName},</if>
+            <if test="ruleCode != null and ruleCode != ''">rule_code = #{ruleCode},</if>
+            <if test="conceptId != null">concept_id = #{conceptId},</if>
+            <if test="condition != null">`condition` = #{condition},</if>
+            <if test="action != null">`action` = #{action},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="enabled != null and enabled != ''">enabled = #{enabled},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where rule_id = #{ruleId}
+    </update>
+
+    <delete id="deleteOntologyRuleById" parameterType="Long">
+        delete from ai_ontology_rule where rule_id = #{ruleId}
+    </delete>
+
+    <delete id="deleteOntologyRuleByIds" parameterType="Long">
+        delete from ai_ontology_rule where rule_id in
+        <foreach item="ruleId" collection="array" open="(" separator="," close=")">
+            #{ruleId}
+        </foreach>
+    </delete>
+
+    <select id="checkRuleCodeUnique" resultMap="OntologyRuleResult">
+        <include refid="selectOntologyRuleVo"/>
+        where r.rule_code = #{ruleCode}
+        <if test="ruleId != null and ruleId != 0">
+            and r.rule_id != #{ruleId}
+        </if>
+        limit 1
+    </select>
+
+</mapper>

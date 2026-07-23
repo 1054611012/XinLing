@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.SleepDiaryMapper">
+
+    <resultMap id="SleepDiaryResult" type="com.xinling.app.domain.entity.SleepDiary">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="date" property="date" />
+        <result column="bedtime_activity" property="bedtimeActivity" />
+        <result column="caffeine_intake" property="caffeineIntake" />
+        <result column="exercise" property="exercise" />
+        <result column="emotion" property="emotion" />
+        <result column="note" property="note" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, date, bedtime_activity, caffeine_intake,
+        exercise, emotion, note, create_time
+    </sql>
+
+    <select id="selectById" resultMap="SleepDiaryResult">
+        SELECT <include refid="selectColumns" />
+        FROM sleep_diary
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserIdAndDate" resultMap="SleepDiaryResult">
+        SELECT <include refid="selectColumns" />
+        FROM sleep_diary
+        WHERE user_id = #{userId} AND date = DATE(#{date})
+    </select>
+
+    <select id="selectByUserId" resultMap="SleepDiaryResult">
+        SELECT <include refid="selectColumns" />
+        FROM sleep_diary
+        WHERE user_id = #{userId}
+        ORDER BY date DESC
+    </select>
+
+    <select id="selectAll" resultMap="SleepDiaryResult">
+        SELECT <include refid="selectColumns" />
+        FROM sleep_diary
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sleep_diary (
+            user_id, date, bedtime_activity, caffeine_intake,
+            exercise, emotion, note, create_time
+        ) VALUES (
+            #{userId}, #{date}, #{bedtimeActivity}, #{caffeineIntake},
+            #{exercise}, #{emotion}, #{note}, NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE sleep_diary
+        <set>
+            <if test="bedtimeActivity != null">bedtime_activity = #{bedtimeActivity},</if>
+            <if test="caffeineIntake != null">caffeine_intake = #{caffeineIntake},</if>
+            <if test="exercise != null">exercise = #{exercise},</if>
+            <if test="emotion != null">emotion = #{emotion},</if>
+            <if test="note != null">note = #{note},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <insert id="upsert">
+        INSERT INTO sleep_diary (user_id, date, bedtime_activity, caffeine_intake, exercise, emotion, note, create_time)
+        VALUES (#{userId}, #{date}, #{bedtimeActivity}, #{caffeineIntake}, #{exercise}, #{emotion}, #{note}, NOW())
+        ON DUPLICATE KEY UPDATE
+            bedtime_activity = VALUES(bedtime_activity),
+            caffeine_intake = VALUES(caffeine_intake),
+            exercise = VALUES(exercise),
+            emotion = VALUES(emotion),
+            note = VALUES(note)
+    </insert>
+
+</mapper>

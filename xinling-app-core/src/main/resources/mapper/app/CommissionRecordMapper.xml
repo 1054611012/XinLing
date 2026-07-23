@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.CommissionRecordMapper">
+
+    <resultMap id="CommissionRecordResult" type="com.xinling.app.domain.entity.CommissionRecord">
+        <id column="id" property="id" />
+        <result column="distributor_id" property="distributorId" />
+        <result column="order_no" property="orderNo" />
+        <result column="user_id" property="userId" />
+        <result column="type" property="type" />
+        <result column="amount" property="amount" />
+        <result column="order_amount" property="orderAmount" />
+        <result column="rate" property="rate" />
+        <result column="status" property="status" />
+        <result column="settle_time" property="settleTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, distributor_id, order_no, user_id, type, amount, order_amount, rate,
+        status, settle_time, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="CommissionRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM commission_record
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByDistributorId" resultMap="CommissionRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM commission_record
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByDistributorId" resultType="int">
+        SELECT COUNT(*) FROM commission_record
+        WHERE distributor_id = #{distributorId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO commission_record (
+            distributor_id, order_no, user_id, type, amount, order_amount, rate,
+            status, settle_time
+        ) VALUES (
+            #{distributorId}, #{orderNo}, #{userId}, #{type}, #{amount}, #{orderAmount}, #{rate},
+            #{status}, #{settleTime}
+        )
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE commission_record
+        SET status = #{status},
+            settle_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="sumTodayCommission" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(amount), 0) FROM commission_record
+        WHERE distributor_id = #{distributorId}
+          AND DATE(create_time) = CURDATE()
+    </select>
+
+    <select id="countTodayOrders" resultType="int">
+        SELECT COUNT(DISTINCT order_no) FROM commission_record
+        WHERE distributor_id = #{distributorId}
+          AND DATE(create_time) = CURDATE()
+    </select>
+
+    <select id="countPendingSettle" resultType="int">
+        SELECT COUNT(*) FROM commission_record
+        WHERE distributor_id = #{distributorId}
+          AND status = 0
+    </select>
+
+    <select id="sumPendingSettleAmount" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(amount), 0) FROM commission_record
+        WHERE distributor_id = #{distributorId}
+          AND status = 0
+    </select>
+</mapper>

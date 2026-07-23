@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.DistributionSettingsMapper">
+
+    <resultMap id="DistributionSettingsResult" type="com.xinling.app.domain.entity.DistributionSettings">
+        <id column="id" property="id" />
+        <result column="first_level_rate" property="firstLevelRate" />
+        <result column="second_level_rate" property="secondLevelRate" />
+        <result column="team_reward_rate" property="teamRewardRate" />
+        <result column="min_withdraw_amount" property="minWithdrawAmount" />
+        <result column="withdraw_fee_rate" property="withdrawFeeRate" />
+        <result column="min_withdraw_fee" property="minWithdrawFee" />
+        <result column="settle_days" property="settleDays" />
+        <result column="auto_audit" property="autoAudit" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, first_level_rate, second_level_rate, team_reward_rate, min_withdraw_amount,
+        withdraw_fee_rate, min_withdraw_fee, settle_days, auto_audit,
+        create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="DistributionSettingsResult">
+        SELECT <include refid="selectColumns" />
+        FROM distribution_settings
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectFirst" resultMap="DistributionSettingsResult">
+        SELECT <include refid="selectColumns" />
+        FROM distribution_settings
+        ORDER BY id ASC
+        LIMIT 1
+    </select>
+
+    <update id="updateById">
+        UPDATE distribution_settings
+        <set>
+            <if test="firstLevelRate != null">first_level_rate = #{firstLevelRate},</if>
+            <if test="secondLevelRate != null">second_level_rate = #{secondLevelRate},</if>
+            <if test="teamRewardRate != null">team_reward_rate = #{teamRewardRate},</if>
+            <if test="minWithdrawAmount != null">min_withdraw_amount = #{minWithdrawAmount},</if>
+            <if test="withdrawFeeRate != null">withdraw_fee_rate = #{withdrawFeeRate},</if>
+            <if test="minWithdrawFee != null">min_withdraw_fee = #{minWithdrawFee},</if>
+            <if test="settleDays != null">settle_days = #{settleDays},</if>
+            <if test="autoAudit != null">auto_audit = #{autoAudit},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+</mapper>

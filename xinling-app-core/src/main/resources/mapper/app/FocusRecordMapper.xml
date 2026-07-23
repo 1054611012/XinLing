@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.FocusRecordMapper">
+
+    <resultMap id="FocusRecordResult" type="com.xinling.app.domain.entity.FocusRecord">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="duration" property="duration" />
+        <result column="status" property="status" />
+        <result column="mode" property="mode" />
+        <result column="tag" property="tag" />
+        <result column="interrupt_count" property="interruptCount" />
+        <result column="note" property="note" />
+        <result column="audio_mix_id" property="audioMixId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, start_time, end_time, duration, status,
+        mode, tag, interrupt_count, note, audio_mix_id,
+        create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="FocusRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_record
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByUserId" resultMap="FocusRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_record
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByUserIdAndDateRange" resultMap="FocusRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_record
+        WHERE user_id = #{userId}
+          AND start_time >= #{startDate}
+          AND start_time &lt;= #{endDate}
+          AND is_deleted = 0
+        ORDER BY start_time DESC
+    </select>
+
+    <select id="selectCurrentByUserId" resultMap="FocusRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_record
+        WHERE user_id = #{userId}
+          AND status = 0
+          AND is_deleted = 0
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectList" resultMap="FocusRecordResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_record
+        <where>
+            is_deleted = 0
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectTodayTotalMinutes" resultType="int">
+        SELECT COALESCE(SUM(duration), 0)
+        FROM focus_record
+        WHERE user_id = #{userId}
+          AND DATE(start_time) = CURDATE()
+          AND status = 1
+          AND is_deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO focus_record (
+            user_id, start_time, end_time, duration, status,
+            mode, tag, interrupt_count, note, audio_mix_id,
+            create_time
+        ) VALUES (
+            #{userId}, #{startTime}, #{endTime}, #{duration}, #{status},
+            #{mode}, #{tag}, #{interruptCount}, #{note}, #{audioMixId},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE focus_record
+        <set>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="mode != null">mode = #{mode},</if>
+            <if test="tag != null">tag = #{tag},</if>
+            <if test="interruptCount != null">interrupt_count = #{interruptCount},</if>
+            <if test="note != null">note = #{note},</if>
+            <if test="audioMixId != null">audio_mix_id = #{audioMixId},</if>
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE focus_record
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

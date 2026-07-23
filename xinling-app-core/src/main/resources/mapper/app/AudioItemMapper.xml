@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.AudioItemMapper">
+
+    <resultMap id="AudioItemResult" type="com.xinling.app.domain.entity.AudioItem">
+        <id column="id" property="id" />
+        <result column="file_id" property="fileId" />
+        <result column="title" property="title" />
+        <result column="audio_url" property="audioUrl" />
+        <result column="duration" property="duration" />
+        <result column="file_type" property="fileType" />
+        <result column="file_ext" property="fileExt" />
+        <result column="source_type" property="sourceType" />
+        <result column="narrator" property="narrator" />
+        <result column="play_count" property="playCount" />
+        <result column="tags" property="tags" typeHandler="com.xinling.framework.typehandler.JacksonListTypeHandler" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectAudioItemVo">
+        SELECT id, file_id, title, audio_url, duration, file_type,
+               file_ext, source_type, narrator, play_count, tags,
+               status, sort_order, create_time, update_time
+        FROM audio_item
+    </sql>
+
+    <select id="selectById" resultMap="AudioItemResult">
+        <include refid="selectAudioItemVo" />
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectList" resultMap="AudioItemResult">
+        <include refid="selectAudioItemVo" />
+        WHERE status = 1 AND is_deleted = 0
+        <if test="fileType != null and fileType != ''">
+            AND file_type = #{fileType}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%')
+                 OR tags LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY sort_order ASC, id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(*)
+        FROM audio_item
+        WHERE status = 1 AND is_deleted = 0
+        <if test="fileType != null and fileType != ''">
+            AND file_type = #{fileType}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%')
+                 OR tags LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="selectHistoryByUserId" resultMap="AudioItemResult">
+        SELECT DISTINCT a.id, a.title, a.audio_url, a.duration,
+               a.file_type, a.file_ext, a.source_type,
+               a.play_count, a.tags
+        FROM audio_play_history h
+        JOIN audio_item a ON h.audio_id = a.id
+        WHERE h.user_id = #{userId} AND a.is_deleted = 0
+        ORDER BY h.create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countHistoryByUserId" resultType="int">
+        SELECT COUNT(DISTINCT h.audio_id)
+        FROM audio_play_history h
+        JOIN audio_item a ON h.audio_id = a.id
+        WHERE h.user_id = #{userId} AND a.is_deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO audio_item (file_id, title, audio_url, duration, file_type,
+                                file_ext, source_type, narrator, tags, status, sort_order)
+        VALUES (#{fileId}, #{title}, #{audioUrl}, #{duration}, #{fileType},
+                #{fileExt}, #{sourceType}, #{narrator},
+                #{tags, typeHandler=com.xinling.framework.typehandler.JacksonListTypeHandler},
+                #{status}, #{sortOrder})
+    </insert>
+
+    <update id="updateById">
+        UPDATE audio_item
+        <set>
+            <if test="fileId != null">file_id = #{fileId},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="audioUrl != null">audio_url = #{audioUrl},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="fileExt != null">file_ext = #{fileExt},</if>
+            <if test="sourceType != null">source_type = #{sourceType},</if>
+            <if test="narrator != null">narrator = #{narrator},</if>
+            <if test="tags != null">tags = #{tags, typeHandler=com.xinling.framework.typehandler.JacksonListTypeHandler},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE audio_item SET is_deleted = 1, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updatePlayCount">
+        UPDATE audio_item SET play_count = play_count + 1 WHERE id = #{id}
+    </update>
+
+    <insert id="insertHistory">
+        INSERT INTO audio_play_history (user_id, audio_id, played_duration)
+        VALUES (#{userId}, #{audioId}, #{playedDuration})
+    </insert>
+
+    <!-- ==================== 管理后台接口 ==================== -->
+
+    <select id="selectAdminList" resultMap="AudioItemResult">
+        <include refid="selectAudioItemVo" />
+        <where>
+            is_deleted = 0
+            <if test="fileType != null and fileType != ''">
+                AND file_type = #{fileType}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%')
+                     OR tags LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <select id="countAdminList" resultType="int">
+        SELECT COUNT(*)
+        FROM audio_item
+        <where>
+            is_deleted = 0
+            <if test="fileType != null and fileType != ''">
+                AND file_type = #{fileType}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%')
+                     OR tags LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

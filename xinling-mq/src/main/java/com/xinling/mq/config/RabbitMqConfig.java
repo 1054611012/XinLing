@@ -1,9 +1,6 @@
 package com.xinling.mq.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -84,7 +81,7 @@ public class RabbitMqConfig {
         factory.setMessageConverter(messageConverter());
         factory.setConcurrentConsumers(concurrency); // 单个消费者确保顺序消费
         factory.setMaxConcurrentConsumers(maxConcurrency); // 最大并发消费者数量
-        factory.setAcknowledgeMode(org.springframework.amqp.core.AcknowledgeMode.MANUAL); // 手动ACK模式
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL); // 手动ACK模式
         factory.setPrefetchCount(prefetchCount); // 每次只预取一条消息
         factory.setDefaultRequeueRejected(true); // 拒绝的消息重新入队
         return factory;

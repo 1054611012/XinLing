@@ -1,11 +1,11 @@
 package com.xinling.ai.service;
 
 import com.xinling.ai.config.AiConfigProperties;
-import com.xinling.ai.domain.entity.ChatMessage;
-import com.xinling.ai.enums.RagScene;
+import com.xinling.ai.domain.chat.ChatMessageRecord;
+import com.xinling.ai.domain.enums.RagScene;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.query.Query;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.List;
 public class RagExecutor {
 
     @Autowired
-    private ChatLanguageModel chatLanguageModel;
+    private ChatModel chatLanguageModel;
 
     @Autowired
     private ContentRetriever contentRetriever;
@@ -38,6 +38,9 @@ public class RagExecutor {
 
     @Autowired
     private DatabaseRagService databaseRagService;
+
+    @Autowired
+    private OntologyService ontologyService;
 
     @Autowired
     private AiConfigProperties aiConfig;
@@ -52,11 +55,13 @@ public class RagExecutor {
     /**
      * 执行RAG查询（带历史消息）
      */
-    public String execute(String query, RagScene scene, List<com.xinling.ai.domain.entity.ChatMessage> historyMessages) {
+    public String execute(String query, RagScene scene, List<com.xinling.ai.domain.chat.ChatMessageRecord> historyMessages) {
         try {
             switch (scene) {
                 case NL2SQL:
                     return databaseRagService.queryDatabaseInfo(query);
+                case ONTOLOGY_QA:
+                    return ontologyService.reason(query);
                 case KNOWLEDGE_QA:
                 case QA:
                 default:
@@ -68,7 +73,7 @@ public class RagExecutor {
                     
                     // 添加历史消息
                     if (historyMessages != null && !historyMessages.isEmpty()) {
-                        for (com.xinling.ai.domain.entity.ChatMessage historyMessage : historyMessages) {
+                        for (com.xinling.ai.domain.chat.ChatMessageRecord historyMessage : historyMessages) {
                             if ("user".equals(historyMessage.getRole())) {
                                 messages.add(new UserMessage(historyMessage.getContent()));
                             } else if ("assistant".equals(historyMessage.getRole())) {
@@ -96,7 +101,7 @@ public class RagExecutor {
                     messages.add(new UserMessage(finalQuery));
                     
                     // 生成回答
-                    return chatLanguageModel.generate(messages).content().text();
+                    return chatLanguageModel.chat(messages).aiMessage().text();
             }
         } catch (Exception e) {
             log.error("RAG执行错误", e);
@@ -114,13 +119,12 @@ public class RagExecutor {
     /**
      * 流式执行RAG查询（带历史消息）
      */
-    public Flux<String> stream(String query, RagScene scene, List<com.xinling.ai.domain.entity.ChatMessage> historyMessages) {
+    public Flux<String> stream(String query, RagScene scene, List<com.xinling.ai.domain.chat.ChatMessageRecord> historyMessages) {
         Sinks.Many<String> sink = Sinks.many().multicast().onBackpressureBuffer();
 
         try {
             switch (scene) {
                 case NL2SQL:
-                    // 对于NL2SQL场景，使用数据库RAG服务的流式方法
                     databaseRagService.streamQueryDatabaseInfo(query)
                         .subscribe(
                             token -> sink.tryEmitNext(token),
@@ -130,6 +134,11 @@ public class RagExecutor {
                             },
                             () -> sink.tryEmitComplete()
                         );
+                    break;
+                case ONTOLOGY_QA:
+                    String ontologyResult = ontologyService.reason(query);
+                    sink.tryEmitNext(ontologyResult);
+                    sink.tryEmitComplete();
                     break;
                 case KNOWLEDGE_QA:
                 case QA:

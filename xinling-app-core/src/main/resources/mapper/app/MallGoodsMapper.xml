@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.MallGoodsMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.MallGoods">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="cover" property="cover" />
+        <result column="type" property="type" />
+        <result column="price" property="price" />
+        <result column="stock" property="stock" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, name, description, cover, type, price, stock, status, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM mall_goods
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAvailable" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM mall_goods
+        WHERE status = 1 AND stock > 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM mall_goods
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mall_goods (
+            name, description, cover, type, price, stock, status
+        ) VALUES (
+            #{name}, #{description}, #{cover}, #{type}, #{price}, #{stock}, #{status}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE mall_goods
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

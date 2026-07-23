@@ -58,12 +58,15 @@ public class PsycTestServiceImpl implements IPsycTestService
             List<Long> questionIds = questionsList.stream().map(PsycQuestions::getId).collect(Collectors.toList());
             List<PsycOptions> psycOptions = psycOptionsMapper.selectPsycOptionsListByQuestionIds(questionIds);
 
-            // 将选项列表根据题目id进行分组
-            Map<Long, List<PsycOptions>> questionIdsOptions = psycOptions.stream().collect(Collectors.groupingBy(PsycOptions::getQuestionId));
-            questionsList.forEach(question -> {
-                List<PsycOptions> options = questionIdsOptions.get(question.getId());
-                question.setPsycOptionsList(options != null ? options : new ArrayList<>());
-            });
+            // 判断psycOptions是否为空
+            if (psycOptions != null) {
+                // 将选项列表根据题目id进行分组
+                Map<Long, List<PsycOptions>> questionIdsOptions = psycOptions.stream().collect(Collectors.groupingBy(PsycOptions::getQuestionId));
+                questionsList.forEach(question -> {
+                    List<PsycOptions> options = questionIdsOptions.get(question.getId());
+                    question.setPsycOptionsList(options != null ? options : new ArrayList<>());
+                });
+            }
             psycTest.setPsycQuestionsList(questionsList);
         }
 
@@ -158,6 +161,10 @@ public class PsycTestServiceImpl implements IPsycTestService
             for (PsycAssessmentRule psycAssessmentRule : psycAssessmentRuleList)
             {
                 psycAssessmentRule.setTestId(id);
+                // 设置默认值：未删除
+                if (psycAssessmentRule.getIsDeleted() == null) {
+                    psycAssessmentRule.setIsDeleted(0L);
+                }
                 list.add(psycAssessmentRule);
             }
             if (list.size() > 0)

@@ -1,6 +1,6 @@
 package com.xinling.ai.test;
 
-import com.xinling.ai.utils.QueryTypeUtils;
+import com.xinling.ai.service.utils.QueryTypeUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

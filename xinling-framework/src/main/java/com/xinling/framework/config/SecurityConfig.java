@@ -2,6 +2,7 @@ package com.xinling.framework.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ import com.xinling.framework.security.handle.LogoutSuccessHandlerImpl;
 
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SecurityConfig {
 
     @Autowired
@@ -79,14 +81,30 @@ public class SecurityConfig {
                             "/api/noticeList", "/push/connect/**", "/push/**",
                             "/push/send/**", "/push/status", "/push/disconnect/**").permitAll();
 
-                    // 静态资源
+                    // APP移动端全部放行（APP使用独立的 AppAuthInterceptor 认证）
+                    auth.requestMatchers("/api/app/**").permitAll();
+
+                    // Website端全部放行
+                    auth.requestMatchers("/api/website/**").permitAll();
+
+                    // 官网页面放行
+                    auth.requestMatchers("/website/**").permitAll();
+
+                    // Website端全部放行
+                    auth.requestMatchers("/api/website/**").permitAll();
+
+                    // 官网页面放行
+                    auth.requestMatchers("/website/**").permitAll();
+
+                    // 静态资源（含 /dev-api 前缀，兼容前端代理）
                     auth.requestMatchers(HttpMethod.GET,
                             "/", "/*.html", "/css/**", "/js/**", "/images/**",
                             "/img/**", "/plugins/**", "/static/**", "/public/**",
-                            "/profile/**", "/favicon.ico", "*.css", "*.js").permitAll();
+                            "/profile/**", "/uploads/**", "/dev-api/uploads/**",
+                            "/dev-api/profile/**", "/favicon.ico", "*.css", "*.js").permitAll();
 
-                    // Swagger / Druid
-                    auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**",
+                    // Knife4j / Swagger / Druid
+                    auth.requestMatchers("/doc.html", "/swagger-ui.html", "/swagger-ui/**",
                             "/webjars/**", "/v3/api-docs/**", "/v3/api-docs",
                             "/api-docs/**", "/api-docs", "/druid/**").permitAll();
 

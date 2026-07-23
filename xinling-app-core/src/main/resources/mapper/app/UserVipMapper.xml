@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserVipMapper">
+
+    <resultMap id="UserVipResult" type="com.xinling.app.domain.entity.UserVip">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="package_id" property="packageId" />
+        <result column="package_name" property="packageName" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="auto_renew" property="autoRenew" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="UserVipVOResult" type="com.xinling.app.domain.model.UserVipVO">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="nickname" property="nickname" />
+        <result column="phone" property="phone" />
+        <result column="package_id" property="packageId" />
+        <result column="package_name" property="packageName" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="auto_renew" property="autoRenew" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, package_id, package_name, start_time,
+        end_time, auto_renew, create_time, update_time
+    </sql>
+
+    <sql id="selectUserVipVOColumns">
+        uv.id, uv.user_id, u.nickname, u.phone,
+        uv.package_id, uv.package_name, uv.start_time,
+        uv.end_time, uv.auto_renew, uv.create_time, uv.update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="UserVipResult">
+        SELECT <include refid="selectColumns" />
+        FROM user_vip
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_vip (
+            user_id, package_id, package_name, start_time, end_time,
+            auto_renew, create_time
+        ) VALUES (
+            #{userId}, #{packageId}, #{packageName}, #{startTime}, #{endTime},
+            #{autoRenew}, NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE user_vip
+        <set>
+            <if test="packageId != null">package_id = #{packageId},</if>
+            <if test="packageName != null">package_name = #{packageName},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="autoRenew != null">auto_renew = #{autoRenew},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateAutoRenew">
+        UPDATE user_vip
+        SET auto_renew = #{autoRenew}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectList" resultMap="UserVipVOResult">
+        SELECT <include refid="selectUserVipVOColumns" />
+        FROM user_vip uv
+        LEFT JOIN app_user u ON uv.user_id = u.id AND u.is_deleted = 0
+        <where>
+            <if test="userId != null">
+                AND uv.user_id = #{userId}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND uv.create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND uv.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY uv.create_time DESC
+    </select>
+
+</mapper>

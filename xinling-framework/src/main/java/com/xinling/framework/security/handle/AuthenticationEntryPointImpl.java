@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.alibaba.fastjson2.JSON;
 import com.xinling.common.constant.HttpStatus;
 import com.xinling.common.core.domain.AjaxResult;
@@ -19,6 +20,7 @@ import com.xinling.common.utils.StringUtils;
  * @author xinling
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, Serializable
 {
     private static final long serialVersionUID = -8970718410437077606L;

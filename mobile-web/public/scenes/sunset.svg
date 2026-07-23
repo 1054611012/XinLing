@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="sSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4956a"/>
+      <stop offset="25%" stop-color="#c0805a"/>
+      <stop offset="45%" stop-color="#a06850"/>
+      <stop offset="65%" stop-color="#705048"/>
+      <stop offset="85%" stop-color="#403040"/>
+      <stop offset="100%" stop-color="#282838"/>
+    </linearGradient>
+    <radialGradient id="sSun" cx="50%" cy="12%" r="40%">
+      <stop offset="0%" stop-color="rgba(255,200,140,0.25)"/>
+      <stop offset="50%" stop-color="rgba(255,180,120,0.08)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="sGround" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="50%" stop-color="rgba(30,20,30,0.2)"/>
+      <stop offset="100%" stop-color="rgba(20,10,20,0.5)"/>
+    </linearGradient>
+    <filter id="sBlur"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="390" height="844" fill="url(#sSky)"/>
+  <rect width="390" height="844" fill="url(#sSun)"/>
+  <ellipse cx="30%" cy="45%" rx="50%" ry="10%" fill="rgba(255,180,120,0.03)" filter="url(#sBlur)"/>
+  <path d="M0 844 L0 550 Q30 510 60 480 Q90 440 120 460 Q150 420 180 390 Q210 360 240 380 Q270 370 300 400 Q330 420 360 450 Q380 470 390 500 L390 844Z" fill="rgba(20,15,25,0.2)"/>
+  <path d="M0 844 L0 600 Q40 570 80 550 Q120 520 160 540 Q200 510 240 530 Q280 500 320 520 Q360 540 390 560 L390 844Z" fill="rgba(15,10,20,0.15)"/>
+  <rect width="390" height="844" fill="url(#sGround)"/>
+</svg>

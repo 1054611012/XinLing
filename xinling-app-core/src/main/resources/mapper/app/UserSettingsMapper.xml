@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserSettingsMapper">
+
+    <resultMap id="UserSettingsResult" type="com.xinling.app.domain.entity.UserSettings">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="default_focus_time" property="defaultFocusTime" />
+        <result column="default_break_time" property="defaultBreakTime" />
+        <result column="default_audio_id" property="defaultAudioId" />
+        <result column="dark_mode" property="darkMode" />
+        <result column="notification" property="notification" />
+        <result column="volume" property="volume" />
+        <result column="ai_voice_id" property="aiVoiceId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, default_focus_time, default_break_time,
+        default_audio_id, dark_mode, notification, volume,
+        ai_voice_id, create_time, update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="UserSettingsResult">
+        SELECT <include refid="selectColumns" />
+        FROM user_settings
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_settings (
+            user_id, default_focus_time, default_break_time,
+            default_audio_id, dark_mode, notification, volume, ai_voice_id
+        ) VALUES (
+            #{userId}, #{defaultFocusTime}, #{defaultBreakTime},
+            #{defaultAudioId}, #{darkMode}, #{notification}, #{volume}, #{aiVoiceId}
+        )
+    </insert>
+
+    <update id="updateByUserId">
+        UPDATE user_settings
+        <set>
+            <if test="defaultFocusTime != null">default_focus_time = #{defaultFocusTime},</if>
+            <if test="defaultBreakTime != null">default_break_time = #{defaultBreakTime},</if>
+            <if test="defaultAudioId != null">default_audio_id = #{defaultAudioId},</if>
+            <if test="darkMode != null">dark_mode = #{darkMode},</if>
+            <if test="notification != null">notification = #{notification},</if>
+            <if test="volume != null">volume = #{volume},</if>
+            <if test="aiVoiceId != null">ai_voice_id = #{aiVoiceId},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

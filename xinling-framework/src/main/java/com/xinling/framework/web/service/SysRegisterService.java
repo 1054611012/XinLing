@@ -2,6 +2,7 @@ package com.xinling.framework.web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.constant.CacheConstants;
 import com.xinling.common.constant.Constants;
 import com.xinling.common.constant.UserConstants;
@@ -10,6 +11,7 @@ import com.xinling.common.core.domain.model.RegisterBody;
 import com.xinling.common.core.redis.RedisCache;
 import com.xinling.common.exception.user.CaptchaException;
 import com.xinling.common.exception.user.CaptchaExpireException;
+import com.xinling.common.utils.ActivityLogUtils;
 import com.xinling.common.utils.DateUtils;
 import com.xinling.common.utils.MessageUtils;
 import com.xinling.common.utils.SecurityUtils;
@@ -25,6 +27,7 @@ import com.xinling.system.service.ISysUserService;
  * @author xinling
  */
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class SysRegisterService
 {
     @Autowired
@@ -87,6 +90,9 @@ public class SysRegisterService
             else
             {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
+                
+                // 记录用户注册活动日志(异步,不阻塞主流程)
+                ActivityLogUtils.recordUserRegister(username, sysUser.getUserId());
             }
         }
         return msg;

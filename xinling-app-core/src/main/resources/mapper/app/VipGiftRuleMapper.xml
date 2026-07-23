@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.VipGiftRuleMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.VipGiftRule">
+        <id column="id" property="id" />
+        <result column="rule_name" property="ruleName" />
+        <result column="rule_type" property="ruleType" />
+        <result column="condition_value" property="conditionValue" />
+        <result column="vip_days" property="vipDays" />
+        <result column="auto_grant" property="autoGrant" />
+        <result column="total_limit" property="totalLimit" />
+        <result column="granted_count" property="grantedCount" />
+        <result column="daily_limit" property="dailyLimit" />
+        <result column="status" property="status" />
+        <result column="description" property="description" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, rule_name, rule_type, condition_value, vip_days, auto_grant,
+        total_limit, granted_count, daily_limit, status, description, sort_order,
+        create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM vip_gift_rule
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM vip_gift_rule
+        <where>
+            <if test="ruleType != null and ruleType != ''">
+                AND rule_type = #{ruleType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO vip_gift_rule (rule_name, rule_type, condition_value, vip_days, auto_grant,
+                                   total_limit, daily_limit, status, description, sort_order)
+        VALUES (#{ruleName}, #{ruleType}, #{conditionValue}, #{vipDays}, #{autoGrant},
+                #{totalLimit}, #{dailyLimit}, #{status}, #{description}, #{sortOrder})
+    </insert>
+
+    <update id="updateById">
+        UPDATE vip_gift_rule
+        <set>
+            <if test="ruleName != null">rule_name = #{ruleName},</if>
+            <if test="ruleType != null">rule_type = #{ruleType},</if>
+            <if test="conditionValue != null">condition_value = #{conditionValue},</if>
+            <if test="vipDays != null">vip_days = #{vipDays},</if>
+            <if test="autoGrant != null">auto_grant = #{autoGrant},</if>
+            <if test="totalLimit != null">total_limit = #{totalLimit},</if>
+            <if test="dailyLimit != null">daily_limit = #{dailyLimit},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM vip_gift_rule WHERE id = #{id}
+    </delete>
+
+    <update id="incrementGrantedCount">
+        UPDATE vip_gift_rule
+        SET granted_count = granted_count + 1
+        WHERE id = #{id}
+    </update>
+
+    <select id="countTodayGranted" resultType="int">
+        SELECT COUNT(*)
+        FROM vip_gift_record
+        WHERE rule_id = #{ruleId}
+          AND DATE(create_time) = CURDATE()
+    </select>
+
+</mapper>

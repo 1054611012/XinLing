@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.UserFollowMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.UserFollow">
+        <id column="id" property="id" />
+        <result column="follower_id" property="followerId" />
+        <result column="following_id" property="followingId" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, follower_id, following_id, create_time
+    </sql>
+
+    <select id="selectByFollowerAndFollowing" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_follow
+        WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </select>
+
+    <select id="selectFollowers" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_follow
+        WHERE following_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectFollowing" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM user_follow
+        WHERE follower_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_follow (follower_id, following_id, create_time)
+        VALUES (#{followerId}, #{followingId}, NOW())
+    </insert>
+
+    <delete id="deleteByFollowerAndFollowing">
+        DELETE FROM user_follow
+        WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </delete>
+
+    <select id="countFollowers" resultType="int">
+        SELECT COUNT(*) FROM user_follow WHERE following_id = #{userId}
+    </select>
+
+    <select id="countFollowing" resultType="int">
+        SELECT COUNT(*) FROM user_follow WHERE follower_id = #{userId}
+    </select>
+
+</mapper>

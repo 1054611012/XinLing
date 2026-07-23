@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.ContentBgMapper">
+
+    <resultMap id="ContentBgResult" type="com.xinling.app.domain.entity.ContentBg">
+        <id column="id" property="id" />
+        <result column="content_type" property="contentType" />
+        <result column="content_id" property="contentId" />
+        <result column="url" property="url" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <select id="selectMeditationBg" resultMap="ContentBgResult">
+        SELECT id, content_type, content_id, url, sort_order, create_time
+        FROM content_bg
+        WHERE content_type = 'meditation' AND content_id = #{contentId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectSleepBg" resultMap="ContentBgResult">
+        SELECT id, content_type, content_id, url, sort_order, create_time
+        FROM content_bg
+        WHERE content_type = 'sleep' AND content_id = #{contentId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectWhiteNoiseBg" resultMap="ContentBgResult">
+        SELECT id, content_type, content_id, url, sort_order, create_time
+        FROM content_bg
+        WHERE content_type = 'white_noise' AND content_id = #{contentId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectByContent" resultMap="ContentBgResult">
+        SELECT id, content_type, content_id, url, sort_order, create_time
+        FROM content_bg
+        WHERE content_type = #{contentType} AND content_id = #{contentId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="batchSelectByContentType" resultMap="ContentBgResult">
+        SELECT id, content_type, content_id, url, sort_order, create_time
+        FROM content_bg
+        WHERE content_type = #{contentType} AND content_id IN
+        <foreach collection="contentIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO content_bg (content_type, content_id, url, sort_order)
+        VALUES (#{contentType}, #{contentId}, #{url}, #{sortOrder})
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO content_bg (content_type, content_id, url, sort_order) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.contentType}, #{item.contentId}, #{item.url}, #{item.sortOrder})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByContent">
+        DELETE FROM content_bg WHERE content_type = #{contentType} AND content_id = #{contentId}
+    </delete>
+
+</mapper>

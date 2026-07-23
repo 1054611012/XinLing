@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.FocusSettingsMapper">
+
+    <resultMap id="FocusSettingsResult" type="com.xinling.app.domain.entity.FocusSettings">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="strict_mode" property="strictMode" />
+        <result column="app_block" property="appBlock" />
+        <result column="allowed_apps" property="allowedApps" />
+        <result column="notification_block" property="notificationBlock" />
+        <result column="ai_encouragement" property="aiEncouragement" />
+        <result column="encouragement_interval" property="encouragementInterval" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, user_id, strict_mode, app_block, allowed_apps,
+        notification_block, ai_encouragement, encouragement_interval,
+        create_time, update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="FocusSettingsResult">
+        SELECT <include refid="selectColumns" />
+        FROM focus_settings
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO focus_settings (
+            user_id, strict_mode, app_block, allowed_apps,
+            notification_block, ai_encouragement, encouragement_interval,
+            create_time
+        ) VALUES (
+            #{userId}, #{strictMode}, #{appBlock}, #{allowedApps},
+            #{notificationBlock}, #{aiEncouragement}, #{encouragementInterval},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateByUserId">
+        UPDATE focus_settings
+        <set>
+            <if test="strictMode != null">strict_mode = #{strictMode},</if>
+            <if test="appBlock != null">app_block = #{appBlock},</if>
+            <if test="allowedApps != null">allowed_apps = #{allowedApps},</if>
+            <if test="notificationBlock != null">notification_block = #{notificationBlock},</if>
+            <if test="aiEncouragement != null">ai_encouragement = #{aiEncouragement},</if>
+            <if test="encouragementInterval != null">encouragement_interval = #{encouragementInterval},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

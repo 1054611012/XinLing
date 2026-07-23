@@ -1,21 +1,37 @@
 package com.xinling.framework.aspectj;
 
 import java.util.ArrayList;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.JoinPoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.annotation.DataScope;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.constant.UserConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.BaseEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.entity.SysRole;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.entity.SysUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.domain.model.LoginUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.core.text.Convert;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.SecurityUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.common.utils.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.xinling.framework.security.context.PermissionContextHolder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * 数据过滤处理
@@ -23,7 +39,9 @@ import com.xinling.framework.security.context.PermissionContextHolder;
  * @author xinling
  */
 @Aspect
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 @Component
+@ConditionalOnProperty(name = "xinling.security.enabled", havingValue = "true", matchIfMissing = true)
 public class DataScopeAspect
 {
     /**

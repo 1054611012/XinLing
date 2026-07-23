@@ -62,9 +62,14 @@ public class AiConfigProperties {
         private String apiKey = "ollama";
 
         /**
-         * 模型名称
+         * 聊天模型名称（用于对话、NL2SQL、意图分类等）
          */
-        private String model = "qwen2.5:3b";
+        private String chatModel = "qwen2.5:3b";
+
+        /**
+         * 嵌入模型名称（用于文档向量化，需专用Embedding模型）
+         */
+        private String embeddingModel = "nomic-embed-text";
 
         /**
          * 超时时间（秒）
@@ -77,7 +82,7 @@ public class AiConfigProperties {
         /**
          * 知识库文档路径
          */
-        private String knowledgeBasePath = "/Volumes/Suxia/IdeaProjects/XingLing-Vue/knowledge-base";
+        private String knowledgeBasePath = "/Volumes/Suxia/IdeaProjects/XinLing/knowledge-base";
 
         /**
          * 检索结果数量
@@ -102,8 +107,8 @@ public class AiConfigProperties {
         /**
          * 向量存储路径
          */
-        private String vectorStorePath = "/Volumes/Suxia/IdeaProjects/XingLing-Vue/vector-store";
-        
+        private String vectorStorePath = "/Volumes/Suxia/IdeaProjects/XinLing/vector-store";
+
         /**
          * 初始化完成后状态键的TTL（小时）
          */

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.app.mapper.ChallengeMapper">
+
+    <resultMap id="BaseResultMap" type="com.xinling.app.domain.entity.Challenge">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="description" property="description" />
+        <result column="cover" property="cover" />
+        <result column="type" property="type" />
+        <result column="duration" property="duration" />
+        <result column="condition_value" property="conditionValue" />
+        <result column="points_reward" property="pointsReward" />
+        <result column="vip_days_reward" property="vipDaysReward" />
+        <result column="badge_id" property="badgeId" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, title, description, cover, type, duration, condition_value,
+        points_reward, vip_days_reward, badge_id, start_time, end_time, status, create_time
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM challenge
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAvailable" resultMap="BaseResultMap">
+        SELECT <include refid="selectColumns" />
+        FROM challenge
+        WHERE status = 1 AND NOW() BETWEEN start_time AND end_time
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

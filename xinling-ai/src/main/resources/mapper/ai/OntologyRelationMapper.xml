@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.ai.mapper.OntologyRelationMapper">
+
+    <resultMap type="com.xinling.ai.domain.ontology.OntologyRelation" id="OntologyRelationResult">
+        <result property="relationId"    column="relation_id"    />
+        <result property="sourceConceptId"    column="source_concept_id"    />
+        <result property="sourceConceptName"    column="source_concept_name"    />
+        <result property="targetConceptId"    column="target_concept_id"    />
+        <result property="targetConceptName"    column="target_concept_name"    />
+        <result property="relationType"    column="relation_type"    />
+        <result property="description"    column="description"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectOntologyRelationVo">
+        select r.relation_id, r.source_concept_id, sc.concept_name as source_concept_name, 
+               r.target_concept_id, tc.concept_name as target_concept_name, 
+               r.relation_type, r.description, r.create_time
+        from ai_ontology_relation r
+        left join ai_ontology_concept sc on r.source_concept_id = sc.concept_id
+        left join ai_ontology_concept tc on r.target_concept_id = tc.concept_id
+    </sql>
+
+    <select id="selectOntologyRelationList" parameterType="com.xinling.ai.domain.ontology.OntologyRelation" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        <where>
+            <if test="sourceConceptId != null">
+                AND r.source_concept_id = #{sourceConceptId}
+            </if>
+            <if test="targetConceptId != null">
+                AND r.target_concept_id = #{targetConceptId}
+            </if>
+            <if test="relationType != null and relationType != ''">
+                AND r.relation_type = #{relationType}
+            </if>
+        </where>
+        order by r.create_time desc
+    </select>
+
+    <select id="selectOntologyRelationById" parameterType="Long" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        where r.relation_id = #{relationId}
+    </select>
+
+    <select id="selectRelationsBySource" parameterType="Long" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        where r.source_concept_id = #{sourceConceptId}
+        order by r.create_time desc
+    </select>
+
+    <select id="selectRelationsByTarget" parameterType="Long" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        where r.target_concept_id = #{targetConceptId}
+        order by r.create_time desc
+    </select>
+
+    <select id="selectRelationsByConcept" parameterType="Long" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        where r.source_concept_id = #{conceptId} or r.target_concept_id = #{conceptId}
+        order by r.create_time desc
+    </select>
+
+    <select id="selectRelationBetween" resultMap="OntologyRelationResult">
+        <include refid="selectOntologyRelationVo"/>
+        where r.source_concept_id = #{sourceId} and r.target_concept_id = #{targetId}
+        limit 1
+    </select>
+
+    <insert id="insertOntologyRelation" parameterType="com.xinling.ai.domain.ontology.OntologyRelation" useGeneratedKeys="true" keyProperty="relationId">
+        insert into ai_ontology_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sourceConceptId != null">source_concept_id,</if>
+            <if test="targetConceptId != null">target_concept_id,</if>
+            <if test="relationType != null and relationType != ''">relation_type,</if>
+            <if test="description != null">description,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sourceConceptId != null">#{sourceConceptId},</if>
+            <if test="targetConceptId != null">#{targetConceptId},</if>
+            <if test="relationType != null and relationType != ''">#{relationType},</if>
+            <if test="description != null">#{description},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateOntologyRelation" parameterType="com.xinling.ai.domain.ontology.OntologyRelation">
+        update ai_ontology_relation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sourceConceptId != null">source_concept_id = #{sourceConceptId},</if>
+            <if test="targetConceptId != null">target_concept_id = #{targetConceptId},</if>
+            <if test="relationType != null and relationType != ''">relation_type = #{relationType},</if>
+            <if test="description != null">description = #{description},</if>
+        </trim>
+        where relation_id = #{relationId}
+    </update>
+
+    <delete id="deleteOntologyRelationById" parameterType="Long">
+        delete from ai_ontology_relation where relation_id = #{relationId}
+    </delete>
+
+    <delete id="deleteOntologyRelationByIds" parameterType="Long">
+        delete from ai_ontology_relation where relation_id in
+        <foreach item="relationId" collection="array" open="(" separator="," close=")">
+            #{relationId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRelationsByConceptId" parameterType="Long">
+        delete from ai_ontology_relation where source_concept_id = #{conceptId} or target_concept_id = #{conceptId}
+    </delete>
+
+</mapper>
