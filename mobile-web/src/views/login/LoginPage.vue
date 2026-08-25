@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showLoadingToast, closeToast } from 'vant'
 import { sendCode } from '@/api/user'
 import { useAuthStore } from '@/stores/auth'
 import { useCountdown } from '@/hooks/useCountdown'
+import { buildWechatAuthUrl, WECHAT_STATE, WECHAT_APPID } from '@/utils/constants'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -23,6 +24,32 @@ function formatPhone(v: string) {
 
 watch(phone, (val) => {
   phone.value = formatPhone(val)
+})
+
+/**
+ * 微信授权回跳处理：
+ * 用户点击微信登录后跳转至微信授权页，微信携带 ?code=...&state=... 回跳到本页，
+ * 此处拿到 code 调后端 thirdLogin 完成登录，并清理 URL 中的临时参数。
+ */
+onMounted(async () => {
+  if (authStore.isLoggedIn) return
+  const params = new URLSearchParams(window.location.search)
+  const code = params.get('code')
+  const state = params.get('state')
+  if (code && state === WECHAT_STATE) {
+    // 先清理 URL，避免刷新重复登录
+    const cleanUrl = window.location.origin + window.location.pathname
+    window.history.replaceState({}, '', cleanUrl)
+    const toast = showLoadingToast({ message: '微信登录中...', forbidClick: true, duration: 0 })
+    try {
+      await authStore.loginByWechat(code)
+      closeToast()
+      router.replace('/')
+    } catch {
+      closeToast()
+      showToast('微信登录失败，请重试')
+    }
+  }
 })
 
 async function handleSendCode() {
@@ -54,6 +81,17 @@ async function handleLogin() {
 }
 
 function handleThirdLogin(provider: string) {
+  if (provider === '微信') {
+    if (!WECHAT_APPID) {
+      showToast('微信登录未配置 AppID')
+      return
+    }
+    // 当前页面作为回调地址（需与微信公众平台配置的网页授权回调域名一致）
+    const redirectUri = window.location.origin + window.location.pathname
+    const authUrl = buildWechatAuthUrl(redirectUri)
+    window.location.href = authUrl
+    return
+  }
   showToast(`${provider}登录开发中`)
 }
 </script>
@@ -202,18 +240,27 @@ function handleThirdLogin(provider: string) {
         </div>
         <div class="social-icons">
           <button class="social-btn" @click="handleThirdLogin('微信')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="#07c160">
-              <path d="M8.5 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM12 2C6.48 2 2 5.58 2 10c0 2.35 1.23 4.5 3.22 5.96L4.5 20l3.78-2.07c.54.15 1.1.23 1.72.23.41 0 .8-.03 1.18-.08C13.2 20.4 16.3 22 20 22c1.1 0 2.16-.12 3.16-.34L26 23l-.73-2.33C27.27 19.33 28 17.5 28 15.5 28 11.36 23.52 8 18 8c-.54 0-1.07.04-1.58.12C15.22 6.1 12.5 4.5 9.5 4.5c-.52 0-1.03.05-1.52.14C7.68 3.36 6.18 2.5 4.5 2.5c-.55 0-1.08.06-1.58.18C3.56 1.6 5.4.5 7.5.5c2.3 0 4.38.94 5.97 2.48C14.27 2.34 15.12 2 16 2c1.66 0 3.2.54 4.48 1.44C19.8 3.16 19 3 18.17 3c-1.22 0-2.38.3-3.4.82C13.6 3.3 12.32 3 11 3c-.48 0-.95.04-1.4.12C9.78 2.4 8.94 2 8 2c-.33 0-.65.05-.95.14C7.06 2.06 7.03 2 7 2c.5-.86 1.5-1.5 2.5-1.5.76 0 1.47.28 2 .74C12.23.48 13.1 0 14 0c2.2 0 4.17.94 5.64 2.47C20.88 1.57 22.25 1 23.75 1c2.9 0 5.25 2.35 5.25 5.25 0 1.88-1 3.55-2.5 4.5.16.57.25 1.17.25 1.78 0 3.45-3.15 6.25-7.25 6.25-.54 0-1.07-.04-1.58-.12C16.17 20.3 14.2 22 12 22c-.56 0-1.1-.06-1.63-.16C11.57 20.47 12 19.2 12 18c0-4.42 3.58-8 8-8 .41 0 .82.04 1.22.1C20.2 9.47 19.6 9 19 8.5c-.9-.74-2-1.5-3.5-1.5-.57 0-1.12.08-1.62.23C14.3 6.5 15.2 6 16.5 6c1.1 0 2.1.35 2.98.9C18.6 5.9 17.3 5 15.75 5c-.7 0-1.38.14-2 .4C13.26 4.54 12 4 10.5 4c-.27 0-.54.02-.8.06C10.17 3.04 11.07 2.5 12 2.5c.65 0 1.26.2 1.77.55z"/>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 14.4a4.4 4.4 0 1 1 4.3-5.6c.3-.5.8-.9 1.4-1.1A5 5 0 1 0 14 14.4c-.2 0-.4 0-.6-.05A4.6 4.6 0 0 1 9 14.4z" />
+              <path d="M8.5 14.2 7 16.4l.9-1.7z" fill="#07c160" stroke="none" />
+              <circle cx="7.3" cy="11" r=".9" fill="#07c160" stroke="none" />
+              <circle cx="10.7" cy="11" r=".9" fill="#07c160" stroke="none" />
+              <path d="M14.6 5.2a3 3 0 1 1 2.6 3.4" />
+              <circle cx="14.3" cy="6.8" r=".6" fill="#07c160" stroke="none" />
+              <circle cx="16.6" cy="6.8" r=".6" fill="#07c160" stroke="none" />
             </svg>
           </button>
           <button class="social-btn" @click="handleThirdLogin('QQ')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="#12b7f5">
-              <path d="M12 2C6.5 2 2 5.5 2 9.5c0 2.3 1.3 4.3 3.3 5.6-.2.8-.5 1.5-.8 2.1-.4.7-.6 1.1-.6 1.1s.3.1.8.2c.5.1 1.2.2 2.1.1.9-.1 1.8-.4 2.7-.8.5.2 1 .3 1.5.4-1.3 1.1-2.1 2.5-2.1 4 0 3.1 3.1 5.3 7 5.3s7-2.2 7-5.3c0-1.5-.8-2.9-2.1-4 .5-.1 1-.2 1.5-.4.9.4 1.8.7 2.7.8.9.1 1.6 0 2.1-.1.5-.1.8-.2.8-.2s-.2-.4-.6-1.1c-.3-.6-.6-1.3-.8-2.1 2-1.3 3.3-3.3 3.3-5.6C22 5.5 17.5 2 12 2z"/>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#12b7f5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.2c-2.8 0-4.5 2-4.5 4.4 0 1-.5 1.7-1 2.6-.4.8-.7 1.4-.7 2.1 0 1.2.9 2.1 2 2.5.3.9.8 1.6 1.5 2.1h6.6c.7-.5 1.2-1.2 1.5-2.1 1.1-.4 2-1.3 2-2.5 0-.7-.3-1.3-.7-2.1-.5-.9-1-1.6-1-2.6 0-2.4-1.7-4.4-4.5-4.4z" />
+              <circle cx="9.8" cy="9" r=".9" fill="#12b7f5" stroke="none" />
+              <circle cx="14.2" cy="9" r=".9" fill="#12b7f5" stroke="none" />
             </svg>
           </button>
           <button class="social-btn" @click="handleThirdLogin('Apple')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
-              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.6 6 .53 7.16-.62.93-1.42 1.82-2.58 2.05zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16.3 12.6c0-1.8 1.4-2.7 1.5-2.8-.8-1.2-2.1-1.3-2.6-1.3-1.1-.1-2.1.6-2.7.6-.6 0-1.4-.6-2.3-.6-1.1 0-2.2.6-2.8 1.7-1.2 2.1-.3 5.2 1 6.8.6 1 1.3 1.9 2.2 1.9.9 0 1.2-.6 2.3-.6 1 0 1.3.6 2.2.6 1 0 1.5-.9 2.1-1.9.6-.8.9-1.6.9-1.7-.1-.1-1.7-.6-1.8-2.7z" />
+              <path d="M14.3 6.4c.5-.6.8-1.3.8-2.2-.7 0-1.5.5-2.1 1.1-.5.5-.8 1.2-.8 2.1.7 0 1.6-.4 2.1-1z" />
             </svg>
           </button>
         </div>

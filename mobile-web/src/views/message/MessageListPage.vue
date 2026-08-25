@@ -40,7 +40,7 @@ onMounted(() => { loadData() })
       <div class="empty-section" v-if="!loading && messages.length === 0">
         <van-empty description="暂无私信">
           <template #image>
-            <van-icon name="chat-o" size="64" color="#8888aa" />
+            <AppIcon name="chat-o" size="64" color="#8888aa" />
           </template>
           <template #description>
             <p class="empty-text">暂无私信消息</p>

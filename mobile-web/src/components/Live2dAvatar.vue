@@ -16,6 +16,9 @@
  */
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
+// 占位：Live2D 逻辑见下方注释块；此处声明模板所需的 canvas 引用，避免类型报错
+const canvasRef = ref<HTMLCanvasElement>()
+
 /*
 // ====== 取消注释以下代码即可使用 ======
 

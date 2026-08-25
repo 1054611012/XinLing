@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FuturesSymbolMapper">
+
+    <resultMap id="FuturesSymbolResult" type="com.xinling.stock.domain.entity.FuturesSymbol">
+        <id column="id" property="id" />
+        <result column="futures_code" property="futuresCode" />
+        <result column="futures_name" property="futuresName" />
+        <result column="exchange" property="exchange" />
+        <result column="category" property="category" />
+        <result column="unit" property="unit" />
+        <result column="multiplier" property="multiplier" />
+        <result column="price_tick" property="priceTick" />
+        <result column="description" property="description" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, futures_code, futures_name, exchange, category,
+        unit, multiplier, price_tick, description,
+        status, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="FuturesSymbolResult">
+        SELECT <include refid="selectColumns" /> FROM stk_futures_symbol WHERE id = #{id}
+    </select>
+
+    <select id="selectByCode" resultMap="FuturesSymbolResult">
+        SELECT <include refid="selectColumns" /> FROM stk_futures_symbol WHERE futures_code = #{futuresCode}
+    </select>
+
+    <select id="selectByCategory" resultMap="FuturesSymbolResult">
+        SELECT <include refid="selectColumns" /> FROM stk_futures_symbol WHERE category = #{category} AND status = 1
+    </select>
+
+    <select id="selectAll" resultMap="FuturesSymbolResult">
+        SELECT <include refid="selectColumns" /> FROM stk_futures_symbol WHERE status = 1 ORDER BY category, futures_code
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_futures_symbol (futures_code, futures_name, exchange, category, unit, multiplier, price_tick, description, status, create_time)
+        VALUES (#{futuresCode}, #{futuresName}, #{exchange}, #{category}, #{unit}, #{multiplier}, #{priceTick}, #{description}, #{status}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE stk_futures_symbol
+        <set>
+            <if test="futuresName != null">futures_name = #{futuresName},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -82,7 +82,7 @@ onMounted(() => { initData() })
             :src="authStore.userInfo?.avatar || ''"
           />
           <div class="avatar-overlay">
-            <van-icon name="photograph" size="24" color="white" />
+            <AppIcon name="photograph" size="24" color="white" />
           </div>
         </div>
         <div class="avatar-hint">点击更换头像</div>

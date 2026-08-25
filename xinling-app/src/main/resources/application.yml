@@ -39,6 +39,15 @@ xinling:
     redis-broadcast-enabled: true
     redis-channel: push_channel
 
+  # 微信快捷登录配置
+  # 公众号网页授权：使用公众号 AppID/Secret，并配置网页授权回调域名
+  # 网站应用扫码登录：使用微信开放平台·网站应用 AppID/Secret
+  wechat:
+    appid: your-wechat-appid
+    secret: your-wechat-secret
+    # snsapi_base（静默授权，仅 openid）/ snsapi_userinfo（弹窗授权，可拿昵称头像）
+    scope: snsapi_userinfo
+
 # 服务端配置 - 端口 8081（区别于管理端的 8080）
 server:
   port: 9080

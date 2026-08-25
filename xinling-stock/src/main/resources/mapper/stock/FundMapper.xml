@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FundMapper">
+
+    <resultMap id="FundResult" type="com.xinling.stock.domain.entity.Fund">
+        <id column="id" property="id" />
+        <result column="fund_code" property="fundCode" />
+        <result column="fund_name" property="fundName" />
+        <result column="fund_full_name" property="fundFullName" />
+        <result column="fund_type" property="fundType" />
+        <result column="establish_date" property="establishDate" />
+        <result column="fund_size" property="fundSize" />
+        <result column="manager" property="manager" />
+        <result column="custodian" property="custodian" />
+        <result column="management_fee" property="managementFee" />
+        <result column="custodian_fee" property="custodianFee" />
+        <result column="purchase_fee" property="purchaseFee" />
+        <result column="redeem_fee" property="redeemFee" />
+        <result column="purchase_status" property="purchaseStatus" />
+        <result column="redeem_status" property="redeemStatus" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, fund_code, fund_name, fund_full_name, fund_type, establish_date,
+        fund_size, manager, custodian, management_fee, custodian_fee,
+        purchase_fee, redeem_fee, purchase_status, redeem_status,
+        risk_level, status, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="FundResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund WHERE id = #{id}
+    </select>
+
+    <select id="selectByCode" resultMap="FundResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund WHERE fund_code = #{fundCode}
+    </select>
+
+    <select id="selectByType" resultMap="FundResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund
+        WHERE fund_type = #{fundType} AND is_deleted = 0 AND status = 1
+        ORDER BY fund_size DESC
+    </select>
+
+    <select id="searchByName" resultMap="FundResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund
+        WHERE is_deleted = 0 AND status = 1
+        AND (fund_name LIKE CONCAT('%', #{keyword}, '%') OR fund_code LIKE CONCAT('%', #{keyword}, '%'))
+    </select>
+
+    <select id="selectAll" resultMap="FundResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund WHERE is_deleted = 0 ORDER BY fund_code
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_fund (fund_code, fund_name, fund_full_name, fund_type, establish_date,
+            fund_size, manager, custodian, management_fee, custodian_fee,
+            purchase_fee, redeem_fee, purchase_status, redeem_status,
+            risk_level, status, create_time)
+        VALUES (#{fundCode}, #{fundName}, #{fundFullName}, #{fundType}, #{establishDate},
+            #{fundSize}, #{manager}, #{custodian}, #{managementFee}, #{custodianFee},
+            #{purchaseFee}, #{redeemFee}, #{purchaseStatus}, #{redeemStatus},
+            #{riskLevel}, #{status}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE stk_fund
+        <set>
+            <if test="fundName != null">fund_name = #{fundName},</if>
+            <if test="fundSize != null">fund_size = #{fundSize},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

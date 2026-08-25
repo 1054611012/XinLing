@@ -28,6 +28,16 @@ export interface AppLoginBody {
   inviterId?: number
 }
 
+/** 第三方（微信）登录请求体 */
+export interface ThirdLoginBody {
+  platform: 'wechat' | string
+  code: string
+  deviceId?: string
+  deviceName?: string
+  deviceType?: string
+  inviterId?: number
+}
+
 export interface LoginResponseVO {
   token: string
   userInfo: AppUserInfoVO
@@ -131,6 +141,8 @@ export interface AudioItem {
   playCount: number
   isFavorite: boolean
   tags: string[]
+  coverUrl?: string
+  category?: string
 }
 
 export interface AudioMix {

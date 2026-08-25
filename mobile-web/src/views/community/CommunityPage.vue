@@ -147,14 +147,14 @@ onMounted(() => {
               >
                 <template v-if="!moment.avatar" #error>
                   <div class="avatar-placeholder">
-                    <van-icon name="contact" size="18" color="#6b6b8d" />
+                    <AppIcon name="contact" size="18" color="#6b6b8d" />
                   </div>
                 </template>
               </van-image>
               <div class="moment-user-info">
                 <div class="moment-nickname-row">
                   <span class="moment-nickname">{{ moment.nickname || '匿名用户' }}</span>
-                  <van-tag v-if="moment.vipStatus > 0" round size="small" color="#f5af19" class="vip-tag">VIP</van-tag>
+                  <van-tag v-if="moment.vipStatus > 0" round color="#f5af19" class="vip-tag">VIP</van-tag>
                 </div>
                 <div class="moment-time">{{ formatRelativeTime(moment.createTime) }}</div>
               </div>
@@ -200,7 +200,7 @@ onMounted(() => {
             <!-- Actions -->
             <div class="moment-actions">
               <div class="action-item like-btn" :class="{ liked: moment.isLiked }" @click.stop="handleLike(moment)">
-                <van-icon
+                <AppIcon
                   :name="moment.isLiked ? 'like' : 'like-o'"
                   :color="moment.isLiked ? '#ee0a24' : '#8888aa'"
                   size="18"
@@ -208,7 +208,7 @@ onMounted(() => {
                 <span class="action-count">{{ formatCount(moment.likeCount) }}</span>
               </div>
               <div class="action-item" @click.stop="goDetail(moment.id)">
-                <van-icon name="chat-o" color="#8888aa" size="18" />
+                <AppIcon name="chat-o" color="#8888aa" size="18" />
                 <span class="action-count">{{ formatCount(moment.commentCount) }}</span>
               </div>
             </div>

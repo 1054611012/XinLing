@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.SectorPerformanceMapper">
+
+    <resultMap id="PerformanceResult" type="com.xinling.stock.domain.entity.SectorPerformance">
+        <id column="id" property="id" />
+        <result column="sector_id" property="sectorId" />
+        <result column="trade_date" property="tradeDate" />
+        <result column="change_pct" property="changePct" />
+        <result column="volume" property="volume" />
+        <result column="amount" property="amount" />
+        <result column="advance_count" property="advanceCount" />
+        <result column="decline_count" property="declineCount" />
+        <result column="limit_up_count" property="limitUpCount" />
+        <result column="limit_down_count" property="limitDownCount" />
+        <result column="leader_stock" property="leaderStock" />
+        <result column="leader_change_pct" property="leaderChangePct" />
+        <result column="rank_1d" property="rank1d" />
+        <result column="rank_5d" property="rank5d" />
+        <result column="rank_20d" property="rank20d" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, sector_id, trade_date, change_pct, volume, amount,
+        advance_count, decline_count, limit_up_count, limit_down_count,
+        leader_stock, leader_change_pct, rank_1d, rank_5d, rank_20d, create_time
+    </sql>
+
+    <select id="selectBySectorAndDate" resultMap="PerformanceResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector_performance
+        WHERE sector_id = #{sectorId} AND trade_date = #{tradeDate}
+    </select>
+
+    <select id="selectBySectorAndDateRange" resultMap="PerformanceResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector_performance
+        WHERE sector_id = #{sectorId}
+        AND trade_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY trade_date
+    </select>
+
+    <select id="selectByDateOrderByChange" resultMap="PerformanceResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector_performance
+        WHERE trade_date = #{tradeDate}
+        ORDER BY change_pct DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectTopRankByDate" resultMap="PerformanceResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector_performance
+        WHERE trade_date = #{tradeDate}
+        ORDER BY rank_1d ASC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_sector_performance (
+            sector_id, trade_date, change_pct, volume, amount,
+            advance_count, decline_count, limit_up_count, limit_down_count,
+            leader_stock, leader_change_pct, rank_1d, rank_5d, rank_20d, create_time
+        ) VALUES (
+            #{sectorId}, #{tradeDate}, #{changePct}, #{volume}, #{amount},
+            #{advanceCount}, #{declineCount}, #{limitUpCount}, #{limitDownCount},
+            #{leaderStock}, #{leaderChangePct}, #{rank1d}, #{rank5d}, #{rank20d}, NOW()
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO stk_sector_performance (
+            sector_id, trade_date, change_pct, volume, amount,
+            advance_count, decline_count, limit_up_count, limit_down_count,
+            leader_stock, leader_change_pct, rank_1d, rank_5d, rank_20d, create_time
+        ) VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.sectorId}, #{item.tradeDate}, #{item.changePct}, #{item.volume}, #{item.amount},
+             #{item.advanceCount}, #{item.declineCount}, #{item.limitUpCount}, #{item.limitDownCount},
+             #{item.leaderStock}, #{item.leaderChangePct}, #{item.rank1d}, #{item.rank5d}, #{item.rank20d}, NOW())
+        </foreach>
+    </insert>
+
+    <update id="updateBySectorAndDate">
+        UPDATE stk_sector_performance
+        <set>
+            change_pct = #{changePct}, volume = #{volume}, amount = #{amount},
+            advance_count = #{advanceCount}, decline_count = #{declineCount},
+            limit_up_count = #{limitUpCount}, limit_down_count = #{limitDownCount},
+            leader_stock = #{leaderStock}, leader_change_pct = #{leaderChangePct},
+            rank_1d = #{rank1d}, rank_5d = #{rank5d}, rank_20d = #{rank20d}
+        </set>
+        WHERE sector_id = #{sectorId} AND trade_date = #{tradeDate}
+    </update>
+
+</mapper>

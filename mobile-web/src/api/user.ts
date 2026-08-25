@@ -7,11 +7,17 @@ import type {
   AppUserInfoVO,
   UpdateUserBody,
   UserDevice,
-  UserSettings
+  UserSettings,
+  ThirdLoginBody
 } from '@/types/api'
 
 export function login(data: AppLoginBody): Promise<ApiResponse<LoginResponseVO>> {
   return request.post('/user/login', data, { headers: { _loading: false } })
+}
+
+/** 微信快捷登录：携带微信授权 code 换取 token */
+export function wechatLogin(data: ThirdLoginBody): Promise<ApiResponse<LoginResponseVO>> {
+  return request.post('/user/thirdLogin', data, { headers: { _loading: false } })
 }
 
 export function sendCode(data: SendCodeBody): Promise<ApiResponse<null>> {

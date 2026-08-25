@@ -173,12 +173,12 @@ ai:
 │
 ┌─────┴──────────────┐
 │   Ollama Server    │
-│   Qwen/Llama3/Phi │
+│   Qwen/Llama3/Phi  │
 └────────────────────┘
 
 ┌────────────────────┐
-│ Vector DB           │ In-Memory / Chroma
-│ Embedding Model     │ AllMiniLmL6V2
+│ Vector DB          │ In-Memory / Chroma
+│ Embedding Model    │ AllMiniLmL6V2
 └────────────────────┘
 ```
 

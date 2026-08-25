@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.ConfigScoreWeightMapper">
+
+    <resultMap id="ConfigResult" type="com.xinling.stock.domain.entity.ConfigScoreWeight">
+        <id column="id" property="id" />
+        <result column="dimension_code" property="dimensionCode" />
+        <result column="dimension_name" property="dimensionName" />
+        <result column="weight" property="weight" />
+        <result column="enabled" property="enabled" />
+        <result column="update_freq" property="updateFreq" />
+        <result column="description" property="description" />
+        <result column="scoring_rule" property="scoringRule" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, dimension_code, dimension_name, weight, enabled, update_freq,
+        description, scoring_rule, create_time, update_time
+    </sql>
+
+    <select id="selectAllEnabled" resultMap="ConfigResult">
+        SELECT <include refid="selectColumns" /> FROM stk_config_score_weight
+        WHERE enabled = 1 ORDER BY weight DESC
+    </select>
+
+    <select id="selectByCode" resultMap="ConfigResult">
+        SELECT <include refid="selectColumns" /> FROM stk_config_score_weight
+        WHERE dimension_code = #{dimensionCode}
+    </select>
+
+    <select id="selectAll" resultMap="ConfigResult">
+        SELECT <include refid="selectColumns" /> FROM stk_config_score_weight ORDER BY weight DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_config_score_weight (dimension_code, dimension_name, weight, enabled, update_freq, description, scoring_rule, create_time)
+        VALUES (#{dimensionCode}, #{dimensionName}, #{weight}, #{enabled}, #{updateFreq}, #{description}, #{scoringRule}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE stk_config_score_weight
+        <set>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="scoringRule != null">scoring_rule = #{scoringRule},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

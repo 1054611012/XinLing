@@ -195,27 +195,27 @@ onMounted(() => {
       <div class="features-title">会员权益</div>
       <div class="feature-list">
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>无限次专注模式</span>
         </div>
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>高级睡眠分析报告</span>
         </div>
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>全部助眠音频解锁</span>
         </div>
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>AI 助手深度对话</span>
         </div>
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>去广告纯净体验</span>
         </div>
         <div class="feature-item">
-          <van-icon name="success" color="#00c896" size="18" />
+          <AppIcon name="success" color="#00c896" size="18" />
           <span>云数据同步备份</span>
         </div>
       </div>

@@ -120,14 +120,14 @@ onMounted(() => {
           >
             <template v-if="!moment.avatar" #error>
               <div class="avatar-placeholder">
-                <van-icon name="contact" size="20" :color="'var(--app-text-secondary)'" />
+                <AppIcon name="contact" size="20" :color="'var(--app-text-secondary)'" />
               </div>
             </template>
           </van-image>
           <div class="moment-user-info">
             <div class="moment-nickname-row">
               <span class="moment-nickname">{{ moment.nickname || '匿名用户' }}</span>
-              <van-tag v-if="moment.vipStatus > 0" round size="mini" color="#f5af19" class="vip-tag">VIP</van-tag>
+              <van-tag v-if="moment.vipStatus > 0" round color="#f5af19" class="vip-tag">VIP</van-tag>
             </div>
             <div class="moment-time">{{ formatRelativeTime(moment.createTime) }}</div>
           </div>
@@ -155,7 +155,7 @@ onMounted(() => {
 
         <div class="moment-stats">
           <div class="stat-item" :class="{ liked: moment.isLiked }" @click="handleLike">
-            <van-icon
+            <AppIcon
               :name="moment.isLiked ? 'like' : 'like-o'"
               :color="moment.isLiked ? '#ee0a24' : '#8888aa'"
               size="20"
@@ -163,7 +163,7 @@ onMounted(() => {
             <span>{{ moment.likeCount }}</span>
           </div>
           <div class="stat-item">
-            <van-icon name="chat-o" :color="'var(--app-text-secondary)'" size="20" />
+            <AppIcon name="chat-o" :color="'var(--app-text-secondary)'" size="20" />
             <span>{{ moment.commentCount }}</span>
           </div>
         </div>
@@ -173,7 +173,7 @@ onMounted(() => {
       <div class="comments-section fade-in" style="animation-delay: 0.15s">
         <div class="comments-title">评论 ({{ comments.length }})</div>
         <div v-if="comments.length === 0" class="no-comments">
-          <van-icon name="chat-o" size="40" :color="'var(--app-border)'" />
+          <AppIcon name="chat-o" size="40" :color="'var(--app-border)'" />
           <span>暂无评论，来说点什么吧</span>
         </div>
         <div
@@ -190,14 +190,14 @@ onMounted(() => {
           >
             <template v-if="!comment.avatar" #error>
               <div class="comment-avatar-placeholder">
-                <van-icon name="contact" size="14" :color="'var(--app-text-secondary)'" />
+                <AppIcon name="contact" size="14" :color="'var(--app-text-secondary)'" />
               </div>
             </template>
           </van-image>
           <div class="comment-body">
             <div class="comment-nickname-row">
               <span class="comment-nickname">{{ comment.nickname || '匿名用户' }}</span>
-              <van-tag v-if="comment.vipStatus > 0" round size="mini" color="#f5af19" class="vip-tag">VIP</van-tag>
+              <van-tag v-if="comment.vipStatus > 0" round color="#f5af19" class="vip-tag">VIP</van-tag>
             </div>
             <div class="comment-text">{{ comment.content }}</div>
             <div class="comment-time">{{ formatRelativeTime(comment.createTime) }}</div>
@@ -426,7 +426,7 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.no-comments :deep(.van-icon) {
+.no-comments :deep(.app-icon) {
   color: rgba(46, 36, 51, 0.04) !important;
 }
 

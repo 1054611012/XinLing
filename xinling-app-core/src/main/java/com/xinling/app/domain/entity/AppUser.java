@@ -72,6 +72,16 @@ public class AppUser implements Serializable {
     private Long inviterId;
 
     /**
+     * 微信 OpenID（与 appid 一一对应）
+     */
+    private String wxOpenid;
+
+    /**
+     * 微信 UnionID（同一微信开放平台下统一）
+     */
+    private String wxUnionid;
+
+    /**
      * 最后登录IP
      */
     private String lastLoginIp;
@@ -136,6 +146,12 @@ public class AppUser implements Serializable {
 
     public Long getInviterId() { return inviterId; }
     public void setInviterId(Long inviterId) { this.inviterId = inviterId; }
+
+    public String getWxOpenid() { return wxOpenid; }
+    public void setWxOpenid(String wxOpenid) { this.wxOpenid = wxOpenid; }
+
+    public String getWxUnionid() { return wxUnionid; }
+    public void setWxUnionid(String wxUnionid) { this.wxUnionid = wxUnionid; }
 
     public String getLastLoginIp() { return lastLoginIp; }
     public void setLastLoginIp(String lastLoginIp) { this.lastLoginIp = lastLoginIp; }

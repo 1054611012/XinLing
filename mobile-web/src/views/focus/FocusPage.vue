@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showConfirmDialog, Popup, Slider } from 'vant'
+import { showToast, showConfirmDialog } from 'vant'
 import { useFocusStore } from '@/stores/focus'
 
 const router = useRouter()
@@ -132,7 +132,7 @@ onUnmounted(() => {
     <!-- Header -->
     <div class="focus-header">
       <button v-if="isIdle()" class="header-btn" @click="handleBack">
-        <van-icon name="arrow-left" size="20" color="rgba(255,255,255,0.7)" />
+        <AppIcon name="arrow-left" size="20" color="rgba(255,255,255,0.7)" />
       </button>
       <div v-else style="width: 36px;"></div>
       <span class="header-title">{{ isActive() ? activeMode().label : '专注' }}</span>
@@ -214,21 +214,21 @@ onUnmounted(() => {
         <div class="controls-row">
           <template v-if="focusStore.isRunning && !focusStore.isPaused">
             <button class="ctrl-btn pause" @click="handlePause">
-              <van-icon name="pause" size="18" />
+              <AppIcon name="pause" size="18" />
               <span>暂停</span>
             </button>
             <button class="ctrl-btn end" @click="handleEnd">
-              <van-icon name="stop" size="18" />
+              <AppIcon name="stop" size="18" />
               <span>结束</span>
             </button>
           </template>
           <template v-if="focusStore.isPaused">
             <button class="ctrl-btn resume" @click="handleResume">
-              <van-icon name="play" size="18" />
+              <AppIcon name="play" size="18" />
               <span>继续</span>
             </button>
             <button class="ctrl-btn end" @click="handleEnd">
-              <van-icon name="stop" size="18" />
+              <AppIcon name="stop" size="18" />
               <span>结束</span>
             </button>
           </template>
@@ -261,7 +261,7 @@ onUnmounted(() => {
     </template>
 
     <!-- ===== Duration Picker Popup ===== -->
-    <Popup
+    <van-popup
       v-model:show="showDurationPicker"
       position="bottom"
       round
@@ -280,7 +280,7 @@ onUnmounted(() => {
       </div>
       
       <div class="duration-slider-area">
-        <Slider
+        <van-slider
           v-model="editingDuration"
           :min="editingModeConfig[editingModeKey]?.min ?? 5"
           :max="editingModeConfig[editingModeKey]?.max ?? 180"
@@ -298,7 +298,7 @@ onUnmounted(() => {
         <button class="duration-btn cancel" @click="showDurationPicker = false">取消</button>
         <button class="duration-btn confirm" @click="confirmDuration">确定</button>
       </div>
-    </Popup>
+    </van-popup>
   </div>
 </template>
 

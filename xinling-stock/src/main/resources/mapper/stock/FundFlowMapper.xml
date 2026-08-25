@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FundFlowMapper">
+
+    <resultMap id="FundFlowResult" type="com.xinling.stock.domain.entity.FundFlow">
+        <id column="id" property="id" />
+        <result column="stock_code" property="stockCode" />
+        <result column="trade_date" property="tradeDate" />
+        <result column="main_net_inflow" property="mainNetInflow" />
+        <result column="super_large_inflow" property="superLargeInflow" />
+        <result column="large_inflow" property="largeInflow" />
+        <result column="medium_inflow" property="mediumInflow" />
+        <result column="small_inflow" property="smallInflow" />
+        <result column="main_net_pct" property="mainNetPct" />
+        <result column="main_inflow_rank" property="mainInflowRank" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, stock_code, trade_date, main_net_inflow, super_large_inflow, large_inflow,
+        medium_inflow, small_inflow, main_net_pct, main_inflow_rank, create_time
+    </sql>
+
+    <select id="selectByStockAndDate" resultMap="FundFlowResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_flow
+        WHERE stock_code = #{stockCode} AND trade_date = #{tradeDate}
+    </select>
+
+    <select id="selectByStockAndDateRange" resultMap="FundFlowResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_flow
+        WHERE stock_code = #{stockCode}
+        AND trade_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY trade_date
+    </select>
+
+    <select id="selectByDateOrderByMainInflow" resultMap="FundFlowResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_flow
+        WHERE trade_date = #{tradeDate}
+        ORDER BY main_net_inflow DESC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_fund_flow (stock_code, trade_date, main_net_inflow, super_large_inflow,
+            large_inflow, medium_inflow, small_inflow, main_net_pct, main_inflow_rank, create_time)
+        VALUES (#{stockCode}, #{tradeDate}, #{mainNetInflow}, #{superLargeInflow},
+            #{largeInflow}, #{mediumInflow}, #{smallInflow}, #{mainNetPct}, #{mainInflowRank}, NOW())
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO stk_fund_flow (stock_code, trade_date, main_net_inflow, super_large_inflow,
+            large_inflow, medium_inflow, small_inflow, main_net_pct, main_inflow_rank, create_time)
+        VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.stockCode}, #{item.tradeDate}, #{item.mainNetInflow}, #{item.superLargeInflow},
+             #{item.largeInflow}, #{item.mediumInflow}, #{item.smallInflow}, #{item.mainNetPct}, #{item.mainInflowRank}, NOW())
+        </foreach>
+    </insert>
+
+</mapper>

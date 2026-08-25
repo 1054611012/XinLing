@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AnimatedBackground: typeof import('./src/components/common/AnimatedBackground.vue')['default']
+    AppIcon: typeof import('./src/components/AppIcon.vue')['default']
     FrameBasedAvatar: typeof import('./src/components/FrameBasedAvatar.vue')['default']
     Live2dAvatar: typeof import('./src/components/Live2dAvatar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -21,7 +22,6 @@ declare module 'vue' {
     VanDatePicker: typeof import('vant/es')['DatePicker']
     VanEmpty: typeof import('vant/es')['Empty']
     VanField: typeof import('vant/es')['Field']
-    VanIcon: typeof import('vant/es')['Icon']
     VanImage: typeof import('vant/es')['Image']
     VanList: typeof import('vant/es')['List']
     VanLoading: typeof import('vant/es')['Loading']
@@ -37,8 +37,6 @@ declare module 'vue' {
     VanSwipeItem: typeof import('vant/es')['SwipeItem']
     VanSwitch: typeof import('vant/es')['Switch']
     VanTab: typeof import('vant/es')['Tab']
-    VanTabbar: typeof import('vant/es')['Tabbar']
-    VanTabbarItem: typeof import('vant/es')['TabbarItem']
     VanTabs: typeof import('vant/es')['Tabs']
     VanTag: typeof import('vant/es')['Tag']
     VideoAvatar: typeof import('./src/components/VideoAvatar.vue')['default']

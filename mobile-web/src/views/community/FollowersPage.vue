@@ -55,7 +55,7 @@ onMounted(() => { loadData() })
         >
           <template v-if="!user.avatar" #error>
             <div class="user-avatar-placeholder">
-              <van-icon name="contact" size="22" color="#6b6b8d" />
+              <AppIcon name="contact" size="22" color="#6b6b8d" />
             </div>
           </template>
         </van-image>

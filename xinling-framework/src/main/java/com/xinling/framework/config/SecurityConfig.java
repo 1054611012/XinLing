@@ -96,6 +96,9 @@ public class SecurityConfig {
                     // 官网页面放行
                     auth.requestMatchers("/website/**").permitAll();
 
+                    // AI股票分析系统 API
+                    auth.requestMatchers("/api/stock/**").permitAll();
+
                     // 静态资源（含 /dev-api 前缀，兼容前端代理）
                     auth.requestMatchers(HttpMethod.GET,
                             "/", "/*.html", "/css/**", "/js/**", "/images/**",

@@ -94,7 +94,7 @@ async function handleSubmit() {
     <div class="create-options">
       <div class="option-item">
         <span class="option-label">
-          <van-icon name="eye-o" class="option-icon" />
+          <AppIcon name="eye-o" class="option-icon" />
           匿名发布
         </span>
         <van-switch
@@ -107,7 +107,7 @@ async function handleSubmit() {
 
       <div class="option-item">
         <span class="option-label">
-          <van-icon name="lock-o" class="option-icon" />
+          <AppIcon name="lock-o" class="option-icon" />
           可见范围
         </span>
         <van-radio-group v-model="visibility" direction="horizontal" class="visibility-group">

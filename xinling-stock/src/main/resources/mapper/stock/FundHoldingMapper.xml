@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FundHoldingMapper">
+
+    <resultMap id="FundHoldingResult" type="com.xinling.stock.domain.entity.FundHolding">
+        <id column="id" property="id" />
+        <result column="fund_code" property="fundCode" />
+        <result column="report_date" property="reportDate" />
+        <result column="report_type" property="reportType" />
+        <result column="stock_code" property="stockCode" />
+        <result column="stock_name" property="stockName" />
+        <result column="hold_amount" property="holdAmount" />
+        <result column="hold_ratio" property="holdRatio" />
+        <result column="rank_no" property="rankNo" />
+        <result column="industry" property="industry" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, fund_code, report_date, report_type, stock_code, stock_name,
+        hold_amount, hold_ratio, rank_no, industry, create_time
+    </sql>
+
+    <select id="selectByFundAndReport" resultMap="FundHoldingResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_holdings
+        WHERE fund_code = #{fundCode} AND report_date = #{reportDate}
+        ORDER BY rank_no
+    </select>
+
+    <select id="selectLatestByFund" resultMap="FundHoldingResult">
+        SELECT h.* FROM stk_fund_holdings h
+        INNER JOIN (
+            SELECT fund_code, MAX(report_date) AS max_date FROM stk_fund_holdings
+            WHERE fund_code = #{fundCode} GROUP BY fund_code
+        ) latest ON h.fund_code = latest.fund_code AND h.report_date = latest.max_date
+        ORDER BY h.rank_no
+    </select>
+
+    <select id="selectByStockCode" resultMap="FundHoldingResult">
+        SELECT h.*, f.fund_name FROM stk_fund_holdings h
+        LEFT JOIN stk_fund f ON h.fund_code = f.fund_code
+        WHERE h.stock_code = #{stockCode}
+        ORDER BY h.hold_amount DESC
+        LIMIT 20
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_fund_holdings (fund_code, report_date, report_type, stock_code, stock_name,
+            hold_amount, hold_ratio, rank_no, industry, create_time)
+        VALUES (#{fundCode}, #{reportDate}, #{reportType}, #{stockCode}, #{stockName},
+            #{holdAmount}, #{holdRatio}, #{rankNo}, #{industry}, NOW())
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO stk_fund_holdings (fund_code, report_date, report_type, stock_code, stock_name,
+            hold_amount, hold_ratio, rank_no, industry, create_time)
+        VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.fundCode}, #{item.reportDate}, #{item.reportType}, #{item.stockCode}, #{item.stockName},
+             #{item.holdAmount}, #{item.holdRatio}, #{item.rankNo}, #{item.industry}, NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteByFundAndReport">
+        DELETE FROM stk_fund_holdings WHERE fund_code = #{fundCode} AND report_date = #{reportDate}
+    </delete>
+
+</mapper>

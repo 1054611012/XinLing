@@ -58,7 +58,7 @@ onMounted(() => { loadData() })
     <van-nav-bar title="设备管理" left-arrow @click-left="router.back()" />
 
     <div class="device-tip">
-      <van-icon name="info-o" color="#8888aa" size="16" />
+      <AppIcon name="info-o" color="#8888aa" size="16" />
       <span>当前设备无法登出</span>
     </div>
 
@@ -69,7 +69,7 @@ onMounted(() => { loadData() })
         class="device-card glass-card"
       >
         <div class="device-icon">
-          <van-icon :name="getDeviceIcon(device.deviceType)" size="32" color="#7c5cff" />
+          <AppIcon :name="getDeviceIcon(device.deviceType)" size="32" color="#7c5cff" />
         </div>
         <div class="device-info">
           <div class="device-name">

@@ -98,7 +98,7 @@ onMounted(() => { loadSettings() })
         <van-cell center title="默认音量" :border="false">
           <template #value>
             <div class="volume-control">
-              <span class="volume-icon"><van-icon name="volume-o" size="16" /></span>
+              <span class="volume-icon"><AppIcon name="volume-o" size="16" /></span>
               <van-slider
                 v-model="settings.volume"
                 :min="0"

@@ -28,6 +28,24 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '睡眠', depth: 1 }
   },
   {
+    path: '/sleep/breathe',
+    name: 'SleepBreathe',
+    component: () => import('@/views/sleep/BreathePage.vue'),
+    meta: { title: '呼吸引导', depth: 2 }
+  },
+  {
+    path: '/sleep/mix',
+    name: 'SleepMix',
+    component: () => import('@/views/sleep/MixPage.vue'),
+    meta: { title: '混音实验室', depth: 2 }
+  },
+  {
+    path: '/sleep/report',
+    name: 'SleepReport',
+    component: () => import('@/views/sleep/ReportPage.vue'),
+    meta: { title: '睡眠报告', depth: 2 }
+  },
+  {
     path: '/audio',
     name: 'Audio',
     component: () => import('@/views/audio/AudioPage.vue'),

@@ -117,7 +117,7 @@ onMounted(() => {
           </div>
         </div>
         <div class="audio-action" @click="togglePlay(audio)">
-          <van-icon
+          <AppIcon
             :name="currentPlaying?.id === audio.id && isPlaying ? 'pause-circle' : 'play-circle'"
             size="36"
             :color="currentPlaying?.id === audio.id ? '#666' : '#999'"
@@ -136,7 +136,7 @@ onMounted(() => {
           <div class="player-progress">{{ isPlaying ? '播放中' : '已暂停' }}</div>
         </div>
         <div class="player-controls">
-          <van-icon
+          <AppIcon
             :name="isPlaying ? 'pause-circle' : 'play-circle'"
             size="36"
             color="#666"

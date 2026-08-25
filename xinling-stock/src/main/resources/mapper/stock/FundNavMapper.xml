@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FundNavMapper">
+
+    <resultMap id="FundNavResult" type="com.xinling.stock.domain.entity.FundNav">
+        <id column="id" property="id" />
+        <result column="fund_code" property="fundCode" />
+        <result column="nav_date" property="navDate" />
+        <result column="unit_nav" property="unitNav" />
+        <result column="total_nav" property="totalNav" />
+        <result column="daily_change_pct" property="dailyChangePct" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, fund_code, nav_date, unit_nav, total_nav, daily_change_pct, create_time
+    </sql>
+
+    <select id="selectByFundAndDate" resultMap="FundNavResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_nav
+        WHERE fund_code = #{fundCode} AND nav_date = #{navDate}
+    </select>
+
+    <select id="selectByFundAndDateRange" resultMap="FundNavResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_nav
+        WHERE fund_code = #{fundCode}
+        AND nav_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY nav_date
+    </select>
+
+    <select id="selectLatestByFund" resultMap="FundNavResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_nav
+        WHERE fund_code = #{fundCode}
+        ORDER BY nav_date DESC LIMIT #{limit}
+    </select>
+
+    <select id="selectLatestOne" resultMap="FundNavResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_nav
+        WHERE fund_code = #{fundCode}
+        ORDER BY nav_date DESC LIMIT 1
+    </select>
+
+    <select id="selectMaxNavDate" resultType="java.util.Date">
+        SELECT MAX(nav_date) FROM stk_fund_nav WHERE fund_code = #{fundCode}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_fund_nav (fund_code, nav_date, unit_nav, total_nav, daily_change_pct, create_time)
+        VALUES (#{fundCode}, #{navDate}, #{unitNav}, #{totalNav}, #{dailyChangePct}, NOW())
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO stk_fund_nav (fund_code, nav_date, unit_nav, total_nav, daily_change_pct, create_time)
+        VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.fundCode}, #{item.navDate}, #{item.unitNav}, #{item.totalNav}, #{item.dailyChangePct}, NOW())
+        </foreach>
+    </insert>
+
+</mapper>

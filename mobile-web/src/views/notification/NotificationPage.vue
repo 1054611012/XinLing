@@ -112,7 +112,7 @@ onMounted(() => {
           >
             <div class="notif-icon">
               <van-badge :dot="!notif.isRead">
-                <van-icon :name="getTypeIcon(notif.type)" size="24" color="#7c5cff" />
+                <AppIcon :name="getTypeIcon(notif.type)" size="24" color="#7c5cff" />
               </van-badge>
             </div>
             <div class="notif-content">

@@ -8,6 +8,8 @@ import com.xinling.app.mapper.AppUserMapper;
 import com.xinling.app.service.IAppUserService;
 import com.xinling.app.service.IVerificationCodeService;
 import com.xinling.app.token.AppTokenService;
+import com.xinling.app.wechat.WechatAuthService;
+import com.xinling.app.wechat.WechatUserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,13 +30,16 @@ public class AppUserServiceImpl implements IAppUserService {
     private final AppUserMapper appUserMapper;
     private final IVerificationCodeService verificationCodeService;
     private final AppTokenService appTokenService;
+    private final WechatAuthService wechatAuthService;
 
     public AppUserServiceImpl(AppUserMapper appUserMapper,
                               IVerificationCodeService verificationCodeService,
-                              AppTokenService appTokenService) {
+                              AppTokenService appTokenService,
+                              WechatAuthService wechatAuthService) {
         this.appUserMapper = appUserMapper;
         this.verificationCodeService = verificationCodeService;
         this.appTokenService = appTokenService;
+        this.wechatAuthService = wechatAuthService;
     }
 
     @Override
@@ -73,12 +78,88 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     @Transactional
     public LoginResponseVO loginByThird(ThirdLoginBody body, String clientIp) {
-        // TODO: 对接微信/QQ/Apple第三方OAuth
-        // 1. 验证第三方token
-        // 2. 查第三方账号绑定关系
-        // 3. 未绑定时自动创建用户
-        // 4. 已绑定时直接登录
-        throw new UnsupportedOperationException("第三方登录尚未实现");
+        String platform = body.getPlatform();
+        if (!"wechat".equalsIgnoreCase(platform)) {
+            throw new UnsupportedOperationException("暂仅支持微信快捷登录，platform=" + platform);
+        }
+        return loginByWechat(body, clientIp);
+    }
+
+    /**
+     * 微信快捷登录
+     * <p>
+     * 流程：前端拿到的授权 code → 后端调微信换取 openid/unionid 与用户资料 →
+     * 优先用 unionid（同一开放平台统一）查找已有账号，其次 openid → 命中则刷新登录，
+     * 未命中则自动创建账号，最后下发 token。
+     * </p>
+     */
+    private LoginResponseVO loginByWechat(ThirdLoginBody body, String clientIp) {
+        String code = body.getCode();
+        if (code == null || code.isEmpty()) {
+            throw new RuntimeException("微信授权码为空");
+        }
+
+        WechatUserProfile profile = wechatAuthService.exchange(code);
+        if (profile == null || profile.getOpenid() == null) {
+            throw new RuntimeException("微信授权失败：无法获取用户标识");
+        }
+
+        AppUser user = null;
+        if (profile.getUnionid() != null && !profile.getUnionid().isEmpty()) {
+            user = appUserMapper.selectByWxUnionId(profile.getUnionid());
+        }
+        if (user == null) {
+            user = appUserMapper.selectByWxOpenid(profile.getOpenid());
+        }
+
+        boolean isNewUser = false;
+        if (user == null) {
+            user = registerByWechat(profile, clientIp, body.getInviterId());
+            isNewUser = true;
+        } else {
+            checkUserStatus(user);
+            // 补全可能缺失的微信标识（如先手机号注册、后微信登录）
+            boolean needUpdate = false;
+            if (user.getWxOpenid() == null && profile.getOpenid() != null) {
+                user.setWxOpenid(profile.getOpenid());
+                needUpdate = true;
+            }
+            if (user.getWxUnionid() == null && profile.getUnionid() != null) {
+                user.setWxUnionid(profile.getUnionid());
+                needUpdate = true;
+            }
+            if (needUpdate) {
+                appUserMapper.updateById(user);
+            }
+        }
+
+        // 更新登录信息
+        appUserMapper.updateLoginInfo(user.getId(), clientIp, new Date());
+
+        LoginResponseVO response = buildLoginResponse(user);
+        log.info("微信登录: id={}, openid={}, unionid={}, newUser={}",
+                user.getId(), profile.getOpenid(), profile.getUnionid(), isNewUser);
+        return response;
+    }
+
+    /**
+     * 根据微信资料创建新用户
+     */
+    private AppUser registerByWechat(WechatUserProfile profile, String registerIp, Long inviterId) {
+        AppUser user = new AppUser();
+        user.setNickname(profile.getNickname() != null && !profile.getNickname().isEmpty()
+                ? profile.getNickname()
+                : AppConstants.DEFAULT_NICKNAME_PREFIX + profile.getOpenid().substring(0, 6));
+        user.setAvatar(profile.getAvatar());
+        user.setGender(profile.getGender() != null ? profile.getGender() : 0);
+        user.setStatus(AppUserStatus.NORMAL.getCode());
+        user.setVipStatus(0);
+        user.setWxOpenid(profile.getOpenid());
+        user.setWxUnionid(profile.getUnionid());
+        user.setInviterId(inviterId != null && inviterId > 0 ? inviterId : null);
+        user.setRegisterIp(registerIp);
+        appUserMapper.insert(user);
+        return user;
     }
 
     @Override

@@ -80,7 +80,7 @@ onMounted(() => {
           <span>{{ getVipLabel(authStore.userInfo?.vipStatus ?? 0) }}</span>
         </div>
       </div>
-      <van-icon name="edit" size="20" color="#999" @click="goTo('/profile/edit')" />
+      <AppIcon name="edit" size="20" color="#999" @click="goTo('/profile/edit')" />
     </div>
 
     <!-- VIP卡片 -->
@@ -94,7 +94,7 @@ onMounted(() => {
       </div>
       <div class="vip-action" v-if="!authStore.isVip">
         <span>立即开通</span>
-        <van-icon name="arrow" size="16" />
+        <AppIcon name="arrow" size="16" />
       </div>
     </div>
 
@@ -102,56 +102,56 @@ onMounted(() => {
     <div class="menu-section">
       <div class="menu-group">
         <div class="menu-item" @click="goTo('/profile/edit')">
-          <van-icon name="user-circle-o" size="20" color="#666" />
+          <AppIcon name="user-circle-o" size="20" color="#666" />
           <span class="menu-label">编辑资料</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/profile/settings')">
-          <van-icon name="setting-o" size="20" color="#666" />
+          <AppIcon name="setting-o" size="20" color="#666" />
           <span class="menu-label">偏好设置</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/profile/devices')">
-          <van-icon name="desktop-o" size="20" color="#666" />
+          <AppIcon name="desktop-o" size="20" color="#666" />
           <span class="menu-label">设备管理</span>
           <span class="menu-badge">{{ deviceCount }}台</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
       </div>
 
       <div class="menu-group">
         <div class="menu-item" @click="goTo('/growth')">
-          <van-icon name="bar-chart-o" size="20" color="#666" />
+          <AppIcon name="bar-chart-o" size="20" color="#666" />
           <span class="menu-label">成长中心</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/rank')">
-          <van-icon name="ascending" size="20" color="#666" />
+          <AppIcon name="ascending" size="20" color="#666" />
           <span class="menu-label">排行榜</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/challenge')">
-          <van-icon name="medal-o" size="20" color="#666" />
+          <AppIcon name="medal-o" size="20" color="#666" />
           <span class="menu-label">挑战活动</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
       </div>
 
       <div class="menu-group">
         <div class="menu-item" @click="goTo('/vip')">
-          <van-icon name="vip-card-o" size="20" color="#666" />
+          <AppIcon name="vip-card-o" size="20" color="#666" />
           <span class="menu-label">会员中心</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/order')">
-          <van-icon name="orders-o" size="20" color="#666" />
+          <AppIcon name="orders-o" size="20" color="#666" />
           <span class="menu-label">我的订单</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
         <div class="menu-item" @click="goTo('/notification')">
-          <van-icon name="bell-o" size="20" color="#666" />
+          <AppIcon name="bell-o" size="20" color="#666" />
           <span class="menu-label">消息通知</span>
-          <van-icon name="arrow" size="16" color="#ccc" />
+          <AppIcon name="arrow" size="16" color="#ccc" />
         </div>
       </div>
     </div>

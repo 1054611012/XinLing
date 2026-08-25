@@ -6,6 +6,7 @@ import com.xinling.app.mapper.ActivityMapper;
 import com.xinling.app.mapper.UserActivityMapper;
 import com.xinling.app.service.IActivityService;
 import org.slf4j.Logger;
+import java.util.Date;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,7 @@ public class ActivityServiceImpl implements IActivityService {
         }
 
         // 检查时间范围
-        java.util.Date now = new java.util.Date();
+        Date now = new Date();
         if (activity.getStartTime() != null && now.before(activity.getStartTime())) {
             throw new RuntimeException("活动尚未开始");
         }

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.FundPerformanceMapper">
+
+    <resultMap id="FundPerfResult" type="com.xinling.stock.domain.entity.FundPerformance">
+        <id column="id" property="id" />
+        <result column="fund_code" property="fundCode" />
+        <result column="stat_date" property="statDate" />
+        <result column="return_1w" property="return1w" />
+        <result column="return_1m" property="return1m" />
+        <result column="return_3m" property="return3m" />
+        <result column="return_6m" property="return6m" />
+        <result column="return_1y" property="return1y" />
+        <result column="return_3y" property="return3y" />
+        <result column="return_5y" property="return5y" />
+        <result column="return_since_establish" property="returnSinceEstablish" />
+        <result column="max_drawdown_1y" property="maxDrawdown1y" />
+        <result column="max_drawdown_3y" property="maxDrawdown3y" />
+        <result column="sharp_ratio_1y" property="sharpRatio1y" />
+        <result column="sharp_ratio_3y" property="sharpRatio3y" />
+        <result column="volatility_1y" property="volatility1y" />
+        <result column="excess_return_1y" property="excessReturn1y" />
+        <result column="rank_1y" property="rank1y" />
+        <result column="morningstar_rating" property="morningstarRating" />
+        <result column="galaxy_rating" property="galaxyRating" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, fund_code, stat_date,
+        return_1w, return_1m, return_3m, return_6m,
+        return_1y, return_3y, return_5y, return_since_establish,
+        max_drawdown_1y, max_drawdown_3y,
+        sharp_ratio_1y, sharp_ratio_3y,
+        volatility_1y, excess_return_1y,
+        rank_1y, morningstar_rating, galaxy_rating,
+        create_time, update_time
+    </sql>
+
+    <select id="selectByFundAndDate" resultMap="FundPerfResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_performance
+        WHERE fund_code = #{fundCode} AND stat_date = #{statDate}
+    </select>
+
+    <select id="selectLatestByFund" resultMap="FundPerfResult">
+        SELECT <include refid="selectColumns" /> FROM stk_fund_performance
+        WHERE fund_code = #{fundCode}
+        ORDER BY stat_date DESC LIMIT 1
+    </select>
+
+    <select id="selectTopByReturn" resultMap="FundPerfResult">
+        SELECT p.*, f.fund_name, f.fund_type FROM stk_fund_performance p
+        LEFT JOIN stk_fund f ON p.fund_code = f.fund_code
+        WHERE p.${period} IS NOT NULL
+        ORDER BY p.${period} DESC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_fund_performance (fund_code, stat_date,
+            return_1w, return_1m, return_3m, return_6m,
+            return_1y, return_3y, return_5y, return_since_establish,
+            max_drawdown_1y, max_drawdown_3y,
+            sharp_ratio_1y, sharp_ratio_3y,
+            volatility_1y, excess_return_1y,
+            rank_1y, morningstar_rating, galaxy_rating, create_time)
+        VALUES (#{fundCode}, #{statDate},
+            #{return1w}, #{return1m}, #{return3m}, #{return6m},
+            #{return1y}, #{return3y}, #{return5y}, #{returnSinceEstablish},
+            #{maxDrawdown1y}, #{maxDrawdown3y},
+            #{sharpRatio1y}, #{sharpRatio3y},
+            #{volatility1y}, #{excessReturn1y},
+            #{rank1y}, #{morningstarRating}, #{galaxyRating}, NOW())
+    </insert>
+
+    <update id="updateByFundAndDate">
+        UPDATE stk_fund_performance
+        <set>
+            return_1w = #{return1w}, return_1m = #{return1m},
+            return_3m = #{return3m}, return_6m = #{return6m},
+            return_1y = #{return1y}, return_3y = #{return3y},
+            return_5y = #{return5y},
+            max_drawdown_1y = #{maxDrawdown1y},
+            sharp_ratio_1y = #{sharpRatio1y},
+            volatility_1y = #{volatility1y},
+            morningstar_rating = #{morningstarRating},
+            galaxy_rating = #{galaxyRating}
+        </set>
+        WHERE fund_code = #{fundCode} AND stat_date = #{statDate}
+    </update>
+
+</mapper>

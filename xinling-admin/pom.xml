@@ -78,6 +78,14 @@
             <artifactId>xinling-app-core</artifactId>
             <version>${xinling.version}</version>
         </dependency>
+
+        <!-- AI股票分析模块 -->
+        <dependency>
+            <groupId>com.xinling</groupId>
+            <artifactId>xinling-stock</artifactId>
+            <version>${xinling.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

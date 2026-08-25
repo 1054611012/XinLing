@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.AnalysisReportMapper">
+
+    <resultMap id="ReportResult" type="com.xinling.stock.domain.entity.AnalysisReport">
+        <id column="id" property="id" />
+        <result column="symbol_type" property="symbolType" />
+        <result column="symbol_code" property="symbolCode" />
+        <result column="symbol_name" property="symbolName" />
+        <result column="analysis_date" property="analysisDate" />
+        <result column="analysis_type" property="analysisType" />
+        <result column="comprehensive_score" property="comprehensiveScore" />
+        <result column="score_detail" property="scoreDetail" />
+        <result column="trend_analysis" property="trendAnalysis" />
+        <result column="ma_analysis" property="maAnalysis" />
+        <result column="macd_analysis" property="macdAnalysis" />
+        <result column="kdj_analysis" property="kdjAnalysis" />
+        <result column="volume_analysis" property="volumeAnalysis" />
+        <result column="sector_analysis" property="sectorAnalysis" />
+        <result column="futures_linkage" property="futuresLinkage" />
+        <result column="fund_analysis" property="fundAnalysis" />
+        <result column="news_sentiment" property="newsSentiment" />
+        <result column="market_sentiment" property="marketSentiment" />
+        <result column="ai_summary" property="aiSummary" />
+        <result column="risk_analysis" property="riskAnalysis" />
+        <result column="buy_probability" property="buyProbability" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="suggested_position" property="suggestedPosition" />
+        <result column="buy_zone" property="buyZone" />
+        <result column="sell_zone" property="sellZone" />
+        <result column="stop_loss" property="stopLoss" />
+        <result column="take_profit" property="takeProfit" />
+        <result column="recommendation" property="recommendation" />
+        <result column="model_used" property="modelUsed" />
+        <result column="prompt_version" property="promptVersion" />
+        <result column="analysis_status" property="analysisStatus" />
+        <result column="error_msg" property="errorMsg" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, symbol_type, symbol_code, symbol_name,
+        analysis_date, analysis_type,
+        comprehensive_score, score_detail,
+        trend_analysis, ma_analysis, macd_analysis, kdj_analysis, volume_analysis,
+        sector_analysis, futures_linkage, fund_analysis, news_sentiment, market_sentiment,
+        ai_summary, risk_analysis,
+        buy_probability, risk_level, suggested_position,
+        buy_zone, sell_zone, stop_loss, take_profit, recommendation,
+        model_used, prompt_version, analysis_status, error_msg,
+        create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="ReportResult">
+        SELECT <include refid="selectColumns" /> FROM stk_analysis_report
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectBySymbolAndDate" resultMap="ReportResult">
+        SELECT <include refid="selectColumns" /> FROM stk_analysis_report
+        WHERE symbol_type = #{symbolType} AND symbol_code = #{symbolCode}
+        AND analysis_date = #{analysisDate} AND analysis_type = #{analysisType}
+        AND is_deleted = 0
+    </select>
+
+    <select id="selectBySymbol" resultMap="ReportResult">
+        SELECT <include refid="selectColumns" /> FROM stk_analysis_report
+        WHERE symbol_type = #{symbolType} AND symbol_code = #{symbolCode}
+        AND is_deleted = 0
+        ORDER BY analysis_date DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectByDate" resultMap="ReportResult">
+        SELECT <include refid="selectColumns" /> FROM stk_analysis_report
+        WHERE analysis_date = #{analysisDate}
+        <if test="analysisType != null and analysisType != ''">
+            AND analysis_type = #{analysisType}
+        </if>
+        AND is_deleted = 0
+        ORDER BY comprehensive_score DESC
+    </select>
+
+    <select id="selectByRecommendation" resultMap="ReportResult">
+        SELECT <include refid="selectColumns" /> FROM stk_analysis_report
+        WHERE recommendation = #{recommendation}
+        AND analysis_date = #{analysisDate} AND is_deleted = 0
+        ORDER BY comprehensive_score DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_analysis_report (
+            symbol_type, symbol_code, symbol_name,
+            analysis_date, analysis_type,
+            comprehensive_score, score_detail,
+            trend_analysis, ma_analysis, macd_analysis, kdj_analysis, volume_analysis,
+            sector_analysis, futures_linkage, fund_analysis, news_sentiment, market_sentiment,
+            ai_summary, risk_analysis,
+            buy_probability, risk_level, suggested_position,
+            buy_zone, sell_zone, stop_loss, take_profit, recommendation,
+            model_used, prompt_version, analysis_status, error_msg,
+            create_time, update_time
+        ) VALUES (
+            #{symbolType}, #{symbolCode}, #{symbolName},
+            #{analysisDate}, #{analysisType},
+            #{comprehensiveScore}, #{scoreDetail},
+            #{trendAnalysis}, #{maAnalysis}, #{macdAnalysis}, #{kdjAnalysis}, #{volumeAnalysis},
+            #{sectorAnalysis}, #{futuresLinkage}, #{fundAnalysis}, #{newsSentiment}, #{marketSentiment},
+            #{aiSummary}, #{riskAnalysis},
+            #{buyProbability}, #{riskLevel}, #{suggestedPosition},
+            #{buyZone}, #{sellZone}, #{stopLoss}, #{takeProfit}, #{recommendation},
+            #{modelUsed}, #{promptVersion}, #{analysisStatus}, #{errorMsg},
+            NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE stk_analysis_report
+        <set>
+            <if test="comprehensiveScore != null">comprehensive_score = #{comprehensiveScore},</if>
+            <if test="scoreDetail != null">score_detail = #{scoreDetail},</if>
+            <if test="trendAnalysis != null">trend_analysis = #{trendAnalysis},</if>
+            <if test="maAnalysis != null">ma_analysis = #{maAnalysis},</if>
+            <if test="macdAnalysis != null">macd_analysis = #{macdAnalysis},</if>
+            <if test="aiSummary != null">ai_summary = #{aiSummary},</if>
+            <if test="riskAnalysis != null">risk_analysis = #{riskAnalysis},</if>
+            <if test="buyProbability != null">buy_probability = #{buyProbability},</if>
+            <if test="riskLevel != null">risk_level = #{riskLevel},</if>
+            <if test="suggestedPosition != null">suggested_position = #{suggestedPosition},</if>
+            <if test="buyZone != null">buy_zone = #{buyZone},</if>
+            <if test="stopLoss != null">stop_loss = #{stopLoss},</if>
+            <if test="takeProfit != null">take_profit = #{takeProfit},</if>
+            <if test="recommendation != null">recommendation = #{recommendation},</if>
+            <if test="analysisStatus != null">analysis_status = #{analysisStatus},</if>
+            <if test="errorMsg != null">error_msg = #{errorMsg},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

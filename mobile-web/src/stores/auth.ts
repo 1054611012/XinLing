@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { login as loginApi, getUserInfo, updateUser } from '@/api/user'
+import { login as loginApi, getUserInfo, updateUser, wechatLogin } from '@/api/user'
 import type { AppUserInfoVO } from '@/types/api'
 import { getToken, setToken, removeToken } from '@/utils/storage'
 import router from '@/router'
@@ -15,6 +15,21 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(phone: string, code: string, inviterId?: number) {
     const res = await loginApi({
       phone,
+      code,
+      inviterId
+    })
+    const data = res.data
+    setToken(data.token)
+    token.value = data.token
+    userInfo.value = data.userInfo
+  }
+
+  /**
+   * 微信快捷登录：用微信授权 code 换取登录态
+   */
+  async function loginByWechat(code: string, inviterId?: number) {
+    const res = await wechatLogin({
+      platform: 'wechat',
       code,
       inviterId
     })
@@ -41,5 +56,5 @@ export const useAuthStore = defineStore('auth', () => {
     await fetchUserInfo()
   }
 
-  return { token, userInfo, isLoggedIn, isVip, login, logout, fetchUserInfo, updateProfile }
+  return { token, userInfo, isLoggedIn, isVip, login, loginByWechat, logout, fetchUserInfo, updateProfile }
 })

@@ -160,7 +160,7 @@ onMounted(() => {
           <div v-if="activeTab === index" class="tab-indicator" />
         </div>
       </div>
-      <van-icon name="search" size="24" color="#666" class="search-icon" />
+      <AppIcon name="search" size="24" color="#666" class="search-icon" />
     </div>
 
     <!-- 探索标签页 -->
@@ -298,7 +298,7 @@ onMounted(() => {
              @click="goToAudio(item)">
           <div class="meditation-cover" :class="item.cover">
             <div v-if="item.badge" class="meditation-badge">{{ item.badge }}</div>
-            <van-icon name="play-circle" size="24" color="#fff" class="play-icon" />
+            <AppIcon name="play-circle" size="24" color="#fff" class="play-icon" />
           </div>
           <div class="meditation-info">
             <div class="meditation-title">{{ item.title }}</div>

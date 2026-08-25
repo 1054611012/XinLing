@@ -1,27 +1,28 @@
-/* ===== 浅色主题(默认) - 潮汐风格 ===== */
+/* ===== 浅色主题(默认) - 晨曦极光 ===== */
 :root {
-  --app-bg-primary: #f8f6f3;
-  --app-bg-secondary: #ffffff;
-  --app-bg-card: #ffffff;
-  --app-text-primary: #2c2c2e;
-  --app-text-secondary: #8e8e93;
-  --app-text-tertiary: #aeaeb2;
-  --app-accent: #5b8ef9;
-  --app-accent-light: #7aa8ff;
-  --app-accent-bg: rgba(91, 142, 249, 0.08);
-  --app-success: #34c759;
-  --app-danger: #ff3b30;
-  --app-border: rgba(0, 0, 0, 0.05);
-  --app-border-strong: rgba(0, 0, 0, 0.08);
-  --app-gradient-1: linear-gradient(135deg, #f8f6f3, #ffffff);
-  --app-gradient-2: linear-gradient(135deg, #5b8ef9, #00c896);
-  --app-shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
-  --app-shadow-glow: 0 0 24px rgba(91, 142, 249, 0.08);
-  --app-input-bg: #f2f2f7;
-  --app-tabbar-bg: rgba(248, 246, 243, 0.95);
-  --app-glass-bg: rgba(255, 255, 255, 0.8);
-  --app-glass-border: rgba(0, 0, 0, 0.06);
-  --app-glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  --app-bg-primary: #F5F4FB;
+  --app-bg-secondary: #FFFFFF;
+  --app-bg-card: #FFFFFF;
+  --app-text-primary: #1E2233;
+  --app-text-secondary: #6B7280;
+  --app-text-tertiary: #9AA1B2;
+  --app-accent: #6D5BD0;
+  --app-accent-light: #9B8CFF;
+  --app-accent-2: #6366F1;
+  --app-accent-bg: rgba(109, 91, 208, 0.10);
+  --app-success: #1FA971;
+  --app-danger: #E5484D;
+  --app-border: rgba(30, 34, 51, 0.07);
+  --app-border-strong: rgba(30, 34, 51, 0.12);
+  --app-gradient-1: linear-gradient(160deg, #FFFFFF, #F5F4FB);
+  --app-gradient-2: linear-gradient(135deg, #7C3AED, #6366F1);
+  --app-shadow-card: 0 6px 24px rgba(30, 34, 51, 0.06);
+  --app-shadow-glow: 0 0 30px rgba(109, 91, 208, 0.14);
+  --app-input-bg: #F1F0F8;
+  --app-tabbar-bg: rgba(255, 255, 255, 0.82);
+  --app-glass-bg: rgba(255, 255, 255, 0.72);
+  --app-glass-border: rgba(30, 34, 51, 0.08);
+  --app-glass-shadow: 0 8px 30px rgba(30, 34, 51, 0.10);
 
   /* Radius */
   --app-radius-sm: 16px;
@@ -29,29 +30,31 @@
   --app-radius-lg: 28px;
 }
 
-/* ===== 深色主题 - 潮汐风格 ===== */
+/* ===== 深色主题 - 深空极光（冥想睡眠） ===== */
 :root.dark-mode {
-  --app-bg-primary: #000000;
-  --app-bg-secondary: #1c1c1e;
-  --app-bg-card: #2c2c2e;
-  --app-text-primary: #ffffff;
-  --app-text-secondary: #98989d;
-  --app-text-tertiary: #636366;
-  --app-accent: #5b8ef9;
-  --app-accent-light: #7aa8ff;
-  --app-accent-bg: rgba(91, 142, 249, 0.12);
-  --app-success: #30d158;
+  --app-bg-primary: #0F172A;
+  --app-bg-secondary: #111A30;
+  --app-bg-card: #192134;
+  --app-text-primary: #FFFFFF;
+  --app-text-secondary: #94A3B8;
+  --app-text-tertiary: #64748B;
+  --app-accent: #7C3AED;
+  --app-accent-light: #A78BFA;
+  --app-accent-2: #6366F1;
+  --app-accent-bg: rgba(124, 58, 237, 0.14);
+  --app-success: #34D399;
+  --app-danger: #FB7185;
   --app-border: rgba(255, 255, 255, 0.08);
-  --app-border-strong: rgba(255, 255, 255, 0.12);
-  --app-gradient-1: linear-gradient(135deg, #1c1c1e, #000000);
-  --app-gradient-2: linear-gradient(135deg, #5b8ef9, #30d158);
-  --app-shadow-card: 0 2px 16px rgba(0, 0, 0, 0.3);
-  --app-shadow-glow: 0 0 24px rgba(91, 142, 249, 0.15);
-  --app-input-bg: #2c2c2e;
-  --app-tabbar-bg: rgba(0, 0, 0, 0.95);
+  --app-border-strong: rgba(255, 255, 255, 0.14);
+  --app-gradient-1: linear-gradient(160deg, #192134, #0F172A);
+  --app-gradient-2: linear-gradient(135deg, #7C3AED, #6366F1);
+  --app-shadow-card: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --app-shadow-glow: 0 0 32px rgba(124, 58, 237, 0.24);
+  --app-input-bg: #16203A;
+  --app-tabbar-bg: rgba(15, 23, 42, 0.82);
   --app-glass-bg: rgba(255, 255, 255, 0.08);
-  --app-glass-border: rgba(255, 255, 255, 0.08);
-  --app-glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  --app-glass-border: rgba(255, 255, 255, 0.12);
+  --app-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
 
   /* Radius */
   --app-radius-sm: 16px;
@@ -67,12 +70,23 @@
 }
 
 body {
-  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-family: 'Raleway', -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
   background: var(--app-bg-primary);
   color: var(--app-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
+}
+
+/* 标题/数据使用 Lora 衬线，正文/数据使用 Raleway */
+h1, h2, h3, h4,
+.title-large, .title-medium, .title-small,
+.serif {
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+}
+.num, .data-num {
+  font-family: 'Lora', Georgia, serif;
+  font-variant-numeric: lining-nums;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -86,13 +100,26 @@ input, textarea, button { font-family: inherit; }
   padding-bottom: calc(60px + var(--app-safe-area-bottom));
 }
 
-.gradient-text {
-  background: var(--app-gradient-2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* 极光流体背景：深空蓝紫 + 多焦点辉光，绝不使用纯黑 */
+.page-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(58% 38% at 82% -4%, rgba(124, 58, 237, 0.30), transparent 60%),
+    radial-gradient(50% 34% at 8% 10%, rgba(99, 102, 241, 0.22), transparent 60%),
+    radial-gradient(72% 52% at 50% 112%, rgba(67, 56, 202, 0.30), transparent 62%),
+    linear-gradient(180deg, #0F172A 0%, #0B1224 68%, #0F172A 100%);
+}
+:root:not(.dark-mode) .page-gradient {
+  background:
+    radial-gradient(58% 38% at 82% -4%, rgba(124, 58, 237, 0.16), transparent 60%),
+    radial-gradient(50% 34% at 8% 10%, rgba(99, 102, 241, 0.12), transparent 60%),
+    radial-gradient(72% 52% at 50% 112%, rgba(109, 91, 208, 0.16), transparent 62%),
+    linear-gradient(180deg, #FFFFFF 0%, #F5F4FB 100%);
 }
 
+/* 玻璃拟态卡片：白 8% 填充 + 白 12% 描边 */
 .glass-card {
   background: var(--app-glass-bg);
   backdrop-filter: blur(24px);
@@ -100,12 +127,12 @@ input, textarea, button { font-family: inherit; }
   border-radius: var(--app-radius-md);
   border: 1px solid var(--app-glass-border);
   box-shadow: var(--app-glass-shadow);
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s, border-color 0.3s, transform 0.2s;
 }
 
 .glass-card:active {
-  background: rgba(124, 92, 255, 0.08);
-  border-color: rgba(124, 92, 255, 0.15);
+  background: rgba(124, 92, 255, 0.10);
+  border-color: rgba(167, 139, 250, 0.22);
 }
 
 .glass-card-light {
@@ -117,14 +144,27 @@ input, textarea, button { font-family: inherit; }
 }
 
 .glass-card-light:active {
-  background: rgba(124, 92, 255, 0.06);
+  background: rgba(124, 92, 255, 0.08);
 }
 
-.page-gradient {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(180deg, var(--app-bg-primary), var(--app-bg-secondary) 60%, var(--app-bg-primary));
+/* 发光主按钮（深空紫 → 靛蓝） */
+.glow-btn {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
+  border: none;
+  border-radius: var(--app-radius-md);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.40);
+}
+.glow-btn:active { transform: translateY(1px); opacity: 0.95; }
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--app-accent-light), var(--app-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .glow-dot {
@@ -133,12 +173,12 @@ input, textarea, button { font-family: inherit; }
   height: 8px;
   border-radius: 50%;
   background: var(--app-accent);
-  box-shadow: 0 0 12px rgba(124, 92, 255, 0.3);
+  box-shadow: 0 0 12px rgba(124, 92, 255, 0.5);
 }
 
 .icon-svg { display: inline-flex; align-items: center; justify-content: center; }
 
-.title-large { font-size: 26px; font-weight: 600; letter-spacing: 0.5px; }
+.title-large { font-size: 26px; font-weight: 600; letter-spacing: 0.5px; line-height: 1.35; }
 .title-medium { font-size: 18px; font-weight: 500; letter-spacing: 0.3px; }
 .title-small { font-size: 15px; font-weight: 500; }
 .body-text { font-size: 14px; line-height: 1.6; color: var(--app-text-primary); }
@@ -167,16 +207,16 @@ input, textarea, button { font-family: inherit; }
 .clickable:active { opacity: 0.7; }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.05); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: 0.78; }
+  50% { transform: scale(1.12); opacity: 1; }
 }
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(124, 92, 255, 0.12); }
-  50% { box-shadow: 0 0 36px rgba(124, 92, 255, 0.2); }
+  0%, 100% { box-shadow: 0 0 22px rgba(124, 58, 237, 0.18); }
+  50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.32); }
 }
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; }

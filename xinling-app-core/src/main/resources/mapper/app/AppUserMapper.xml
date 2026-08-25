@@ -15,6 +15,8 @@
         <result column="vip_status" property="vipStatus" />
         <result column="vip_end_time" property="vipEndTime" />
         <result column="inviter_id" property="inviterId" />
+        <result column="wx_openid" property="wxOpenid" />
+        <result column="wx_unionid" property="wxUnionid" />
         <result column="last_login_ip" property="lastLoginIp" />
         <result column="last_login_time" property="lastLoginTime" />
         <result column="register_ip" property="registerIp" />
@@ -26,7 +28,8 @@
     <sql id="selectColumns">
         id, nickname, avatar, phone, email, password_hash,
         gender, birthday, status, vip_status, vip_end_time,
-        inviter_id, last_login_ip, last_login_time, register_ip,
+        inviter_id, wx_openid, wx_unionid,
+        last_login_ip, last_login_time, register_ip,
         create_time, update_time, is_deleted
     </sql>
 
@@ -48,6 +51,18 @@
         WHERE email = #{email} AND is_deleted = 0
     </select>
 
+    <select id="selectByWxUnionId" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        WHERE wx_unionid = #{wxUnionid} AND is_deleted = 0
+    </select>
+
+    <select id="selectByWxOpenid" resultMap="AppUserResult">
+        SELECT <include refid="selectColumns" />
+        FROM app_user
+        WHERE wx_openid = #{wxOpenid} AND is_deleted = 0
+    </select>
+
     <select id="countByPhone" resultType="int">
         SELECT COUNT(*) FROM app_user
         WHERE phone = #{phone} AND is_deleted = 0
@@ -57,10 +72,12 @@
         INSERT INTO app_user (
             nickname, avatar, phone, email, password_hash,
             gender, birthday, status, vip_status, inviter_id,
+            wx_openid, wx_unionid,
             register_ip, create_time
         ) VALUES (
             #{nickname}, #{avatar}, #{phone}, #{email}, #{passwordHash},
             #{gender}, #{birthday}, #{status}, #{vipStatus}, #{inviterId},
+            #{wxOpenid}, #{wxUnionid},
             #{registerIp}, NOW()
         )
     </insert>
@@ -78,6 +95,8 @@
             <if test="vipStatus != null">vip_status = #{vipStatus},</if>
             <if test="vipEndTime != null">vip_end_time = #{vipEndTime},</if>
             <if test="inviterId != null">inviter_id = #{inviterId},</if>
+            <if test="wxOpenid != null">wx_openid = #{wxOpenid},</if>
+            <if test="wxUnionid != null">wx_unionid = #{wxUnionid},</if>
         </set>
         WHERE id = #{id} AND is_deleted = 0
     </update>

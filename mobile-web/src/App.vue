@@ -43,7 +43,7 @@ watch(() => route.path, (_to, _from) => {
   min-height: 100dvh;
   background-color: var(--app-bg-primary);
   color: var(--app-text-primary);
-  padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Slide transitions — tide-inspired smoother curves */

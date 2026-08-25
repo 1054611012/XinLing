@@ -14,6 +14,10 @@ public interface AppUserMapper {
 
     AppUser selectByPhone(@Param("phone") String phone);
 
+    AppUser selectByWxUnionId(@Param("wxUnionid") String wxUnionid);
+
+    AppUser selectByWxOpenid(@Param("wxOpenid") String wxOpenid);
+
     AppUser selectByEmail(@Param("email") String email);
 
     List<AppUser> selectUserList(@Param("nickname") String nickname,

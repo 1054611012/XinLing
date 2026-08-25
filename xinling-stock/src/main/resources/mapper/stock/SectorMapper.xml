@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinling.stock.mapper.SectorMapper">
+
+    <resultMap id="SectorResult" type="com.xinling.stock.domain.entity.Sector">
+        <id column="id" property="id" />
+        <result column="sector_code" property="sectorCode" />
+        <result column="sector_name" property="sectorName" />
+        <result column="sector_type" property="sectorType" />
+        <result column="parent_id" property="parentId" />
+        <result column="description" property="description" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        id, sector_code, sector_name, sector_type, parent_id, description,
+        sort_order, status, create_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectById" resultMap="SectorResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByCode" resultMap="SectorResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector WHERE sector_code = #{sectorCode} AND is_deleted = 0
+    </select>
+
+    <select id="selectByType" resultMap="SectorResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector
+        WHERE sector_type = #{sectorType} AND is_deleted = 0 AND status = 1
+        ORDER BY sort_order
+    </select>
+
+    <select id="selectAll" resultMap="SectorResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector WHERE is_deleted = 0 AND status = 1
+        ORDER BY sector_type, sort_order
+    </select>
+
+    <select id="searchByName" resultMap="SectorResult">
+        SELECT <include refid="selectColumns" /> FROM stk_sector
+        WHERE is_deleted = 0 AND status = 1
+        AND sector_name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY sector_type, sort_order
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stk_sector (sector_code, sector_name, sector_type, parent_id, description, sort_order, status, create_time)
+        VALUES (#{sectorCode}, #{sectorName}, #{sectorType}, #{parentId}, #{description}, #{sortOrder}, #{status}, NOW())
+    </insert>
+
+    <update id="updateById">
+        UPDATE stk_sector
+        <set>
+            <if test="sectorName != null">sector_name = #{sectorName},</if>
+            <if test="sectorType != null">sector_type = #{sectorType},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE stk_sector SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

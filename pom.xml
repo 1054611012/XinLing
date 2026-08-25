@@ -201,6 +201,13 @@
                 <version>${xinling.version}</version>
             </dependency>
 
+            <!-- AI股票分析模块 -->
+            <dependency>
+                <groupId>com.xinling</groupId>
+                <artifactId>xinling-stock</artifactId>
+                <version>${xinling.version}</version>
+            </dependency>
+
             <!-- Hutool工具包 -->
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -231,6 +238,7 @@
         <module>xinling-mq</module>
         <module>xinling-app-core</module>
         <module>xinling-app</module>
+        <module>xinling-stock</module>
     </modules>
     <packaging>pom</packaging>
 
