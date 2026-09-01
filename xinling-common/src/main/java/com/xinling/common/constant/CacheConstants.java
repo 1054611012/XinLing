@@ -46,4 +46,9 @@ public class CacheConstants
      * 公告缓存 key
      */
     public static final String SYS_NOTICE_KEY = "sys_notice:";
+
+    /**
+     * 用户生日 redis key（按登录用户隔离，值形如 "1994-11-10|lunar"）
+     */
+    public static final String USER_BIRTHDAY_KEY = "user_birthday:";
 }

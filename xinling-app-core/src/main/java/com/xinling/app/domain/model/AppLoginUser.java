@@ -1,5 +1,7 @@
 package com.xinling.app.domain.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,6 +9,7 @@ import java.util.Date;
  * APP登录用户信息
  * 用于存储用户登录后的会话信息，存入Redis进行会话管理
  */
+@Data
 public class AppLoginUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,22 +43,5 @@ public class AppLoginUser implements Serializable {
      * 登录IP地址
      */
     private String ipaddr;
-
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getNickname() { return nickname; }
-    public void setNickname(String nickname) { this.nickname = nickname; }
-
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
-
-    public Long getLoginTime() { return loginTime; }
-    public void setLoginTime(Long loginTime) { this.loginTime = loginTime; }
-
-    public Long getExpireTime() { return expireTime; }
-    public void setExpireTime(Long expireTime) { this.expireTime = expireTime; }
-
-    public String getIpaddr() { return ipaddr; }
-    public void setIpaddr(String ipaddr) { this.ipaddr = ipaddr; }
+    
 }

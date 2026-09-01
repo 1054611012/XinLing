@@ -80,7 +80,7 @@ public interface IAppUserService {
             String beginTime, String endTime);
 
     /** 管理后台：查询用户详情 */
-    com.xinling.common.core.domain.model.AppUserAdminVO selectAdminUserDetail(Long id);
+    AppUserAdminVO selectAdminUserDetail(Long id);
 
     /** 管理后台：获取用户总数 */
     long countAll();

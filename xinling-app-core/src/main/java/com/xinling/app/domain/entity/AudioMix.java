@@ -1,5 +1,7 @@
 package com.xinling.app.domain.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,6 +9,7 @@ import java.util.Date;
  * 音频合集实体类
  * 用于存储音频合集信息，包含多个音频的组合
  */
+@Data
 public class AudioMix implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,26 +68,4 @@ public class AudioMix implements Serializable {
      */
     private Integer isDeleted;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public String getCoverUrl() { return coverUrl; }
-    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
-    public String getAudioIds() { return audioIds; }
-    public void setAudioIds(String audioIds) { this.audioIds = audioIds; }
-    public Integer getIsDefault() { return isDefault; }
-    public void setIsDefault(Integer isDefault) { this.isDefault = isDefault; }
-    public Integer getSortOrder() { return sortOrder; }
-    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
-    public Integer getStatus() { return status; }
-    public void setStatus(Integer status) { this.status = status; }
-    public Date getCreateTime() { return createTime; }
-    public void setCreateTime(Date createTime) { this.createTime = createTime; }
-    public Date getUpdateTime() { return updateTime; }
-    public void setUpdateTime(Date updateTime) { this.updateTime = updateTime; }
-    public Integer getIsDeleted() { return isDeleted; }
-    public void setIsDeleted(Integer isDeleted) { this.isDeleted = isDeleted; }
 }

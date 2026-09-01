@@ -13,6 +13,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 import com.xinling.common.annotation.Anonymous;
 
 /**
@@ -39,39 +40,47 @@ public class PermitAllUrlProperties implements InitializingBean, ApplicationCont
             // 获取方法上边的注解，只添加不包含路径参数和通配符问题的路径
             Anonymous method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), Anonymous.class);
             if (method != null) {
-                // 检查PatternsCondition是否为null，以避免NPE
-                if (info.getPatternsCondition() != null) {
-                    info.getPatternsCondition().getPatterns().forEach(url -> {
-                        // 检查URL是否包含可能导致问题的字符
-                        if (isValidPattern(url)) {
-                            urls.add(url);
-                            System.out.println("PermitAllUrlProperties: 添加安全的URL模式: " + url);
-                        } else {
-                            // 添加日志来识别有问题的URL模式
-                            System.out.println("PermitAllUrlProperties: 跳过有问题的URL模式: " + url);
-                        }
-                    });
-                }
+                addAnonymousUrls(info);
             }
 
             // 获取类上边的注解，只添加不包含路径参数和通配符问题的路径
             Anonymous controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), Anonymous.class);
             if (controller != null) {
-                // 检查PatternsCondition是否为null，以避免NPE
-                if (info.getPatternsCondition() != null) {
-                    info.getPatternsCondition().getPatterns().forEach(url -> {
-                        // 检查URL是否包含可能导致问题的字符
-                        if (isValidPattern(url)) {
-                            urls.add(url);
-                            System.out.println("PermitAllUrlProperties: 添加安全的URL模式: " + url);
-                        } else {
-                            // 添加日志来识别有问题的URL模式
-                            System.out.println("PermitAllUrlProperties: 跳过有问题的URL模式: " + url);
-                        }
-                    });
-                }
+                addAnonymousUrls(info);
             }
         });
+    }
+
+    /**
+     * 提取 RequestMappingInfo 中的 URL 模式并加入白名单。
+     * <p>
+     * Spring Framework 6.x 默认使用 PathPatternParser（path_pattern_parser）匹配策略，
+     * 此时 {@link RequestMappingInfo#getPatternsCondition()} 返回 null，
+     * 只有 {@link RequestMappingInfo#getPathPatternsCondition()} 有值；
+     * 为兼容旧的 AntPathMatcher 策略，两种条件都尝试读取。
+     */
+    private void addAnonymousUrls(RequestMappingInfo info) {
+        if (info.getPathPatternsCondition() != null) {
+            for (PathPattern pattern : info.getPathPatternsCondition().getPatterns()) {
+                addUrl(pattern.getPatternString());
+            }
+        }
+        if (info.getPatternsCondition() != null) {
+            for (String url : info.getPatternsCondition().getPatterns()) {
+                addUrl(url);
+            }
+        }
+    }
+
+    private void addUrl(String url) {
+        // 检查URL是否包含可能导致问题的字符
+        if (isValidPattern(url)) {
+            urls.add(url);
+            System.out.println("PermitAllUrlProperties: 添加安全的URL模式: " + url);
+        } else {
+            // 添加日志来识别有问题的URL模式
+            System.out.println("PermitAllUrlProperties: 跳过有问题的URL模式: " + url);
+        }
     }
 
     /**

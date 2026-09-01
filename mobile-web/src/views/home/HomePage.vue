@@ -97,7 +97,7 @@ function onTouchEnd(e: TouchEvent) {
   }
 }
 
-// 滚动：极光视差淡出（保底 0.38，永不消失）+ 吸顶头部
+// 滚动：极光平滑淡出（不加 transform 视差，避免 fixed+JS transform 合成层抖动）+ 吸顶头部
 // 用 requestAnimationFrame 批量写入 DOM，避免每个 scroll 事件都直接回流产生抖动
 let scrollTicking = false
 function onScroll() {
@@ -110,11 +110,11 @@ function runScroll() {
   if (!scrollContainer.value) return
   const y = scrollContainer.value.scrollTop
 
+  // 极光淡出：从顶部就开始线性衰减，0~520px 内完全淡出到 0，
+  // 不再加 transform 平移，避免 fixed 元素被 JS 改 transform 造成的合成层抖动 / 撕裂
   if (bgEl.value) {
-    const op = Math.max(0.38, Math.min(1, 1 - (y - 180) / 520))
+    const op = Math.max(0, Math.min(1, 1 - y / 520))
     bgEl.value.style.opacity = String(op)
-    // 还原设计稿 bgWrap 视差：极光随滚动下移并淡出，保底 0.38 不消失
-    bgEl.value.style.transform = 'translateY(' + Math.min(y * 0.35, 280) + 'px)'
   }
 
   // 吸顶头部：带迟滞阈值，避免在临界点反复切换导致头部抖动
@@ -399,7 +399,9 @@ onUnmounted(() => {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  will-change: transform, opacity;
+  will-change: opacity;
+  /* 触发独立合成层，滚动时只重绘 opacity，避免 fixed+transform 的合成层撕裂 */
+  transform: translate3d(0, 0, 0);
 }
 
 .bg-scene {
@@ -473,28 +475,32 @@ onUnmounted(() => {
   -webkit-overflow-scrolling: touch;
 }
 
-/* 吸顶头部：干净的状态切换 */
+/* 吸顶头部：渐变背景 + 玻璃模糊，与下方极光连续过渡（无接缝） */
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 10;
   padding-top: calc(18px + env(safe-area-inset-top, 0px));
-  background: rgba(15, 23, 42, 0.30);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 0.5px solid rgba(167, 139, 250, 0.08);
+  /* 顶部（状态栏）深一些保证可读 → 向下完全透明融入极光 */
+  background: linear-gradient(to bottom,
+    rgba(15, 23, 42, 0.55) 0%,
+    rgba(15, 23, 42, 0.22) 45%,
+    rgba(15, 23, 42, 0) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  /* 不画底部边框，让头部与下方极光无缝衔接 */
   transition:
-    background .4s var(--ease),
-    box-shadow .4s var(--ease),
-    backdrop-filter .4s var(--ease),
-    border-color .4s var(--ease);
+    background .45s var(--ease),
+    box-shadow .45s var(--ease),
+    backdrop-filter .45s var(--ease),
+    -webkit-backdrop-filter .45s var(--ease);
 }
 .sticky-header.pinned {
-  background: rgba(15, 23, 42, 0.82);
+  /* 吸顶后转为整体深色玻璃，与内容区做强分隔 */
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  box-shadow: 0 4px 20px rgba(0,0,0,.30);
-  border-bottom: 0.5px solid rgba(167,139,250,.15);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
 }
 /* 吸顶时平滑收起问候栏：用 max-height 过渡收起，避免 display:none 造成的回流跳动 */
 .sticky-header.pinned .topbar {

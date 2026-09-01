@@ -113,6 +113,10 @@ public class TokenService {
 
     private String getToken(HttpServletRequest request) {
         String token = request.getHeader(tokenProperties.getHeader());
+        // 兼容 Knife4j（doc.html）等调试工具默认使用的 Admin-Token 请求头
+        if (StringUtils.isEmpty(token)) {
+            token = request.getHeader("Admin-Token");
+        }
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
             token = token.substring(Constants.TOKEN_PREFIX.length());
         }

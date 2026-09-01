@@ -9,9 +9,11 @@ import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.github.xiaoymin.knife4j.core.model.MarkdownProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Knife4j OpenApiCustomizer 补丁.
@@ -35,8 +37,7 @@ public class Knife4jFixConfig {
         // 保存字段快照，匿名子类中无法访问父类包级私有字段
         final boolean enabled = knife4jProperties.isEnable();
         final Knife4jSetting setting = knife4jProperties.getSetting();
-        final java.util.List<com.github.xiaoymin.knife4j.core.model.MarkdownProperty> documents =
-                knife4jProperties.getDocuments();
+        final List<MarkdownProperty> documents = knife4jProperties.getDocuments();
 
         return new Knife4jOpenApiCustomizer(knife4jProperties, docProperties) {
             @Override

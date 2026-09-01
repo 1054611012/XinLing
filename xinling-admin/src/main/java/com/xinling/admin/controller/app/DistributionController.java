@@ -114,7 +114,7 @@ public class DistributionController extends BaseController {
     }
 
     /**
-     * 更新分销设置
+     * 更新分销设置3
      */
     @PreAuthorize("@ss.hasPermi('app:distribution:edit')")
     @Log(title = "分销管理", businessType = BusinessType.UPDATE)

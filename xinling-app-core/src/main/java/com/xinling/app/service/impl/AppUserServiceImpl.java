@@ -10,6 +10,7 @@ import com.xinling.app.service.IVerificationCodeService;
 import com.xinling.app.token.AppTokenService;
 import com.xinling.app.wechat.WechatAuthService;
 import com.xinling.app.wechat.WechatUserProfile;
+import com.xinling.common.core.domain.model.AppUserAdminVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -270,7 +271,7 @@ public class AppUserServiceImpl implements IAppUserService {
     }
 
     @Override
-    public com.xinling.common.core.domain.model.AppUserAdminVO selectAdminUserDetail(Long id) {
+    public AppUserAdminVO selectAdminUserDetail(Long id) {
         return appUserMapper.selectAdminUserDetail(id);
     }
 

@@ -5,6 +5,7 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -78,7 +79,7 @@ public class LangChain4jConfig {
      */
     private ChatModel createFallbackChatModel() {
         log.info("创建备用Ollama聊天模型: {}", aiConfigProperties.getOllama().getChatModel());
-        return dev.langchain4j.model.ollama.OllamaChatModel.builder()
+        return OllamaChatModel.builder()
                 .baseUrl(aiConfigProperties.getOllama().getBaseUrl())
                 .modelName(aiConfigProperties.getOllama().getChatModel())
                 .timeout(java.time.Duration.ofSeconds(aiConfigProperties.getOllama().getTimeoutSeconds()))

@@ -590,6 +590,8 @@ CREATE TABLE `app_user` (
   `vip_status` tinyint DEFAULT '0' COMMENT 'VIP状态 0-普通 1-VIP 2-终身VIP',
   `vip_end_time` datetime DEFAULT NULL COMMENT 'VIP到期时间',
   `inviter_id` bigint DEFAULT NULL COMMENT '邀请人ID',
+  `wx_openid` varchar(64) DEFAULT NULL COMMENT '微信OpenID(与appid一一对应)',
+  `wx_unionid` varchar(64) DEFAULT NULL COMMENT '微信UnionID(同一开放平台下统一)',
   `last_login_ip` varchar(50) DEFAULT NULL COMMENT '最后登录IP',
   `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
   `register_ip` varchar(50) DEFAULT NULL COMMENT '注册IP',
@@ -599,6 +601,8 @@ CREATE TABLE `app_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `phone` (`phone`),
   UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `uk_wx_unionid` (`wx_unionid`),
+  UNIQUE KEY `uk_wx_openid` (`wx_openid`),
   KEY `idx_inviter_id` (`inviter_id`),
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='APP用户表';
@@ -4120,6 +4124,7 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2303, '字段映射新增', 2301, 2, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'ai:ontology:fieldMapping:add', '#', 'admin', '2026-07-14 09:37:52', '', NULL, '');
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2304, '字段映射修改', 2301, 3, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'ai:ontology:fieldMapping:edit', '#', 'admin', '2026-07-14 09:37:52', '', NULL, '');
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2305, '字段映射删除', 2301, 4, '', NULL, NULL, '', 1, 0, 'F', '0', '0', 'ai:ontology:fieldMapping:remove', '#', 'admin', '2026-07-14 09:37:52', '', NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `route_name`, `is_frame`, `is_cache`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2310, 'AI分析', 0, 8, 'stock/analysis', 'stock/analysis/index', NULL, 'StockAnalysis', 1, 0, 'C', '0', '0', 'stock:analysis:list', 'chart', 'admin', '2026-08-24 15:38:00', '', NULL, '股票AI分析菜单(顶级)');
 COMMIT;
 
 -- ----------------------------
